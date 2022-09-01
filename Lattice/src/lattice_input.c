@@ -2,14 +2,27 @@
 #include <stdlib.h>
 #include <math.h>
 #include <complex.h>
-#include "/media/ze/Tool/EPM/include/atom.h"
+#include "memory.h"
+#include "util.h"
+#include "reader.h"
+#include "../include/atom.h"
 
-void Build_La	(Lattice *s, const char *filename)
+void ReadPoscar	(Lattice *s, const char *title)
 {
 	int			i,j;
 	double		lc;
-	char 		title[60];
+	char 		*filename;
+
+	filename = Fullpath
 	
+	if(!FileExists(filename))
+    {
+        free(filename);
+        printf("No .region file found.\n Current mesh is regionless.\n");
+        fflush(stdout);
+        return;
+    }
+
 //	fscanf(fp, "%[^\n]", title);
 	if(fgets(title,60,fp)==NULL){
 		puts(title);

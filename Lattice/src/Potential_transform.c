@@ -7,7 +7,6 @@
 #include <math.h>
 #include <complex.h>
 #include <time.h>
-#include <fftw3.h>
 
 #define QPI 0.785398163
 #define TPI 6.283185307

@@ -3,7 +3,7 @@ typedef struct atom
     double tau[3]; //direct atomic position
     unsigned int spe; // specie of the atom
     unsigned int *n_neighbor; //array of number of neighbors from various type of atoms
-    /* data */
+
 }Atom;
 
 typedef struct atomstack
@@ -15,8 +15,7 @@ typedef struct atomstack
 
     /*neighbor information array*/
     unsigned int *neigh_storage;
-    unsigned int **neigh_arary;
-    /* data */
+    // unsigned int **neigh_arary;
 }AtomStack;
 
 typedef struct param
@@ -36,11 +35,18 @@ typedef struct paramstack
 
 typedef struct lattice
 {
+    char   title[60];
+    /*Info of atom species*/
+	unsigned int n_spe; // number of atom spycies
+    unsigned int *natom_spe;
+    char    **mat_name;
+    char    *mat_storage;
+
 	double a[3][3]; //lattice vector
-	unsigned int n_bands; // number of bands
+
     unsigned int n_kstep; // number of strps per k-path
     double Emax; //cut off energy (in Rydberg)
-	AtomStack *a_set;
+	AtomStack *a_set;// Atom sets
     ParamStack  *pset_storage;
     ParamStack  **pset_array; // array of pointers to the base atom type
 } Lattice;

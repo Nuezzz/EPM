@@ -6,66 +6,60 @@
 #include "memory.h"
 #include "util.h"
 #include "reader.h"
-#include "../include/atom.h"
+#include "atom.h"
 
-static inline void ReadLatticeVector( Lattice *s, FILE *fp, double lat_con)
+static inline void ReadLatticeVector( Lattice *s, Reader *fr, double lat_con)
 {
 	int	i,j;
+	char *s0;
 	for(i = 0; i < 3; i++){
-	for (j = 0 ; j < 3; j++){
-			fscanf(fp,"%lf",&(s->a[i][j]));
-			s->a[i][j] *= lat_con;
+		
+
+		for (j = 0 ; j < 3; j++){
+			s0 = ReaderGetEntry(fr, 2+i,j);
+			s->a[i][j] = atof(s0)* lat_con;
 		}// end j
 	}//end i
 }
 
-static inline void ReadMatInfo( Lattice *s, FILE *fp )
+static inline void ReadMatInfo( Lattice *s, Reader *fr )
 {
-	int         i=0;
-	int			mat_count = 0;
-	int			storage_count = 0;
-	char 		buff[INPUT_BUFSIZE];
-	char		*pch;
-	// count number of material name
-	fgets(buff,INPUT_BUFSIZE,fp);	
+	int    	i;
+	char	*s0;	
 
-	pch = strtok (buff," ,.-");
-  	while (pch != NULL)
-  	{
-		mat_count ++;
-		storage_count += strlen(pch);
-    	pch = strtok (NULL, " ,.-");
-  	}
-	free(pch);
-	s->n_spe = mat_count;
-	s->mat_name = SafeCalloc(mat_count, sizeof( char*));
-	s->mat_storage = SafeCalloc(storage_count, sizeof( char));
+
+	// count number of material name
+
+	s->n_spe = ReaderGetLineLength(fr, 5);
+	s->mat_name = SafeCalloc(s->n_spe, sizeof( char*));
 	// read again and record the names
-	pch = strtok (buff," ,.-");
-  	while (pch != NULL)
+  	for(i=0; i<s->n_spe; i++)
   	{
-		s->mat_name[i++]=pch;
-    	pch = strtok (NULL, " ,.-");
+		s0=ReaderGetEntry(fr, 5,i);
+		StringClone(s->mat_name[i],s0);
   	}
 
 }
 
-static inline void ReadAtomNum(Lattice *s, FILE *fp)
+static inline void ReadAtomNum(Lattice *s, Reader *fr)
 {
+	char	*s0;
 	s->natom_spe = SafeCalloc(s->n_spe, sizeof(int));
 	for(int i=0; i < s->n_spe; i++)
 	{
-		fscanf(fp,"%d",&(s->natom_spe[i]));
+		s0=ReaderGetEntry(fr, 6,i);
+		s->natom_spe[i] = atoi(s0);
 	}
 }
 
 
-static inline void ReadAtomPos(Lattice *s, FILE *fp)
+static inline void ReadAtomPos(Lattice *s, Reader *fr)
 {
 	Atom *atom;
 	char *type;
+	char *s0;
 	int  i,j,k;
-	int	 N = s->a_set->n_atoms;
+	int	 N = 0;
 	double tmp[3];
 	double lv[3][3];
 
@@ -78,21 +72,43 @@ static inline void ReadAtomPos(Lattice *s, FILE *fp)
 
 
 	/* get the type of atom position*/
-	fgets(type,60,fp);
+	type = ReaderGetEntry(fr, 7, 0);
 
 	// get type of coordination of atoms position
 	if (strcmp(type, "Direct"))
 	{
-		for(k=0; k<s->n_spe; k++)
+		for(k=0, i=0; k<s->n_spe; k++)
 		{
-			N = s->natom_spe[k];
-				for(i = 0; i < N; i++)
+			N += s->natom_spe[k];
+				for(; i < N; i++)
 				{
 					atom= s->a_set->atom_array[i];
 
 					for (j = 0 ; j < 3; j++)
 					{
-						fscanf(fp,"%lf",(tmp+j));
+						s0=ReaderGetEntry(fr, 8+i,j);
+						// tmp[j]=atof(s0);
+						atom->tau[j]=atof(s0);
+					}
+
+					atom->spe = k;
+					// atom->tau[0] = lv[0][0]*tmp[0]+lv[1][0]*tmp[1]+lv[2][0]*tmp[2];
+					// atom->tau[1] = lv[0][1]*tmp[0]+lv[1][1]*tmp[1]+lv[2][1]*tmp[2];
+					// atom->tau[2] = lv[0][2]*tmp[0]+lv[1][2]*tmp[1]+lv[2][2]*tmp[2];
+				}
+		}
+		FindNeighbor (4.0, s);
+		for(k=0, i=0; k<s->n_spe; k++)
+		{
+			N += s->natom_spe[k];
+				for(; i < N; i++)
+				{
+					atom= s->a_set->atom_array[i];
+
+					for (j = 0 ; j < 3; j++)
+					{
+						s0=ReaderGetEntry(fr, 8+i,j);
+						tmp[j]=atof(s0);
 					}
 
 					atom->spe = k;
@@ -104,15 +120,16 @@ static inline void ReadAtomPos(Lattice *s, FILE *fp)
 	}
 	else
 	{
-		for(k=0; k<s->n_spe; k++)
+		for(k=0, i = 0; k<s->n_spe; k++)
 		{
-			N = s->natom_spe[k];
-				for(i = 0; i < N; i++)
+			N += s->natom_spe[k];
+				for(; i < N; i++)
 				{
 					atom= s->a_set->atom_array[i];
 
 					for (j = 0 ; j < 3; j++){
-						fscanf(fp,"%lf",(tmp+j));
+						s0=ReaderGetEntry(fr, 8+i,j);
+						tmp[j]=atof(s0);
 					}
 
 					atom->spe = k;
@@ -127,7 +144,7 @@ static inline void ReadAtomPos(Lattice *s, FILE *fp)
 }
 
 
-AtomStack *AsetInitial( unsigned int Nspe, unsigned int *Natomspe)
+static inline AtomStack *AsetInitial( unsigned int Nspe, unsigned int *Natomspe)
 {
 	/*Sum up the total atom number*/
 	AtomStack *Aset;
@@ -140,29 +157,34 @@ AtomStack *AsetInitial( unsigned int Nspe, unsigned int *Natomspe)
 	Aset->n_atoms =N;
 	Aset->atom_storage	= SafeCalloc(N, sizeof(Atom));
 	Aset->atom_array  	= SafeCalloc(N, sizeof(Atom*));
-	Aset->neigh_storage = SafeCalloc(Nspe, sizeof(unsigned int));
+	Aset->neigh_storage = SafeCalloc(N, sizeof(unsigned int )*Nspe);
+	for(int i =0; i<N; i++)
+	{
+		Aset->atom_array[i]=&(Aset->atom_storage[i]);
+		Aset->atom_array[i]->n_neighbor = &(Aset->neigh_storage[i]);
+	}
 	return Aset;
 
 
 }
 
-void ReadPoscar	(Lattice *s)
+static inline void ReadPoscar	(Lattice *s, char *title )
 {
 	double		lat_con		=0.0;
 	char 		*filename;
 	char        *name;
 	char        *path;
-	char 		buff[INPUT_BUFSIZE];
-	FILE		*fp;
+	char 		*s0;
+	Reader		*fr;
 
 
 	StringClone(path, "./");
-	StrCat(&path, s->title);
+	StrCat(&path, title);
 	StrCat(&path, "/");
 
 	StringClone(name, "Poscar");
 
-	filename = Fullpath(path, name);
+	filename = FullPath(path, name);
 	
 	if(!FileExists(filename))
     {
@@ -172,27 +194,34 @@ void ReadPoscar	(Lattice *s)
         return;
     }
 
-	fp = SafeFOpen(filename,"r");
+	fr = ReaderReadFile(filename);
+	s0 = ReaderGetEntry(fr,0,0);
 
+    
+	printf("Lattice %s is used for band structure calculation\n",s0);
 
-//	fscanf(fp, "%[^\n]", title);
-	if(fgets(buff,INPUT_BUFSIZE,fp)==NULL){
-		puts(buff);
-		printf("Poscar file is corrupted\n");
-		return;
-	};
-
-	printf("Lattice %s is used for band structure calculation\n",buff);
-
-	fscanf(fp,"%lf",&lat_con);
+	s0 = ReaderGetEntry(fr,1,0);
+	lat_con = atof(s0);
 	
-	ReadLatticeVector(s, fp, lat_con);
-	ReadMatInfo(s, fp );
-	ReadAtomNum(s, fp);
+	ReadLatticeVector(s, fr, lat_con);
+	ReadMatInfo(s, fr );
+	ReadAtomNum(s, fr);
 
-	AsetInitial(s->a_set, s->n_spe, s->natom_spe);
+	s->a_set=AsetInitial( s->n_spe, s->natom_spe);
 
-	ReadAtomPos(s, fp);
-	fclose(fp);
+	ReadAtomPos(s, fr);
+
+}
+
+Lattice *LatticeInitial ( char *filename )
+{
+	char 	*s0;
+	Lattice *L;
+	L = SafeCalloc(1,sizeof(Lattice));
+	ReadPoscar(L, filename);
+	
+	
+	return L;
+
 
 }

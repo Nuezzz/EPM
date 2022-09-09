@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.5)
-project(MC3D)
+cmake_minimum_required(VERSION 1.0)
+project(EPM)
 set(CMAKE_C_FLAGS_RELEASE "-DNDEBUG -O3")
 set(CMAKE_C_FLAGS_DEBUG "-Wall -g")
 
 # This will allow the user to choose to compile the MC3D with UMFPACK or PARDISO
 # Options are "PARDISO" or "UMFPACK" - all caps
-set(SPARSE_SOLVER "PARDISO")
+# set(SPARSE_SOLVER "PARDISO")
 
 # This file finds the SuiteSparse UMFPack installation
 # and adds all of the subdirectories in the MC3D project.
@@ -22,14 +22,13 @@ set(SPARSE_SOLVER "PARDISO")
 #        input files are compatible with the new release
 # MINOR: incremented when functionality is added in a backwards compatible manner
 # PATCH: incremented when bug fixes are implemented in a backwards compatible manner
-set(MAJOR_RELEASE 2)
-set(MINOR_RELEASE 13)
+set(MAJOR_RELEASE 1)
+set(MINOR_RELEASE 0)
 set(PATCH_RELEASE 0)
 ##################################################################################
 # Set CMake module and output binary paths.
 # CMake modules will go in "Source/cmake/Modules/"
 # Binary output will go in "build/bin"
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -38,31 +37,8 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # NOTE: This command only works if it comes before the target is added
 add_compile_options(-m64 -std=gnu11)
 ##################################################################################
-if(${SPARSE_SOLVER} MATCHES "UMFPACK")
-	message("*****Compiling with UMFPACK*****")
-	add_compile_definitions(UMF_SPARSE_SOLVER)
-	find_package(UMFPACK)
-	# List of modules that we want to include
-	set(dirs SparseSolverUmf	SparseMatrixUmf)
-elseif(${SPARSE_SOLVER} MATCHES "PARDISO")
-    	message("*****Compiling with Pardiso*****")
-	add_compile_definitions(PARDISO_SPARSE_SOLVER)
-	find_package(PARDISO)
-	# List of modules that we want to include
-	set(dirs SparseSolverPardiso SparseMatrixPardiso)
-else(${SPARSE_SOLVER} MATCHES "UMFPACK")
-    	message("Sparse Solver input not recognized, compiling with UMFPACK")
-	add_compile_definitions(PARDISO_SPARSE_SOLVER)
-	find_package(PARDISO)
-	# List of modules that we want to include
-	set(dirs SparseSolverPardiso SparseMatrixPardiso)
-endif(${SPARSE_SOLVER} MATCHES "UMFPACK")
 
-set(dirs ${dirs} Control Version RndGen List Reader SpecFun
-	Octree NLSolver
-	Geometry Algebra Particle Material
-	AnalyticBand TPMesh FullBand Scattering
-	Poisson MEMC DEMC Main
+set(dirs Control List Reader Lattice Main
 )
 
 # Find OpenMP installation and set compiler flags
@@ -89,13 +65,9 @@ add_dirs(${dirs})
 
 ##################################################################################
 if(CMAKE_BUILD_TYPE MATCHES "Release")
-    add_executable(MC3D_release Main/src/main.c)
-    target_link_libraries(MC3D_release control octree scattering
-                                particle demc memc dfise 
-                                gmsh specfun version)
+    add_executable(EPM_release Main/src/main.c)
+    target_link_libraries(EPM_release control lattice)
 elseif(CMAKE_BUILD_TYPE MATCHES "Debug")
-    add_executable(MC3D_debug Main/src/main.c)
-    target_link_libraries(MC3D_debug control octree scattering 
-                                particle demc memc dfise
-                                gmsh specfun version)
+    add_executable(EPM_debug Main/src/main.c)
+    target_link_libraries(EPM_debug control lattice)
 endif()

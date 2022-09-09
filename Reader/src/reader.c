@@ -8,6 +8,7 @@
 #include "list.h"
 #include "memory.h"
 #include "reader.h"
+#include "error.h"
 //
 #define BUF_SIZE 1025
 //

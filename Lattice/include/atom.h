@@ -35,7 +35,6 @@ typedef struct paramstack
 
 typedef struct lattice
 {
-    char   title[60];
     /*Info of atom species*/
 	unsigned int n_spe; // number of atom spycies
     unsigned int *natom_spe;
@@ -50,3 +49,6 @@ typedef struct lattice
     ParamStack  *pset_storage;
     ParamStack  **pset_array; // array of pointers to the base atom type
 } Lattice;
+
+Lattice *LatticeInitial ( char *title );
+void    FindNeighbor    (double A_dis, Lattice *l);

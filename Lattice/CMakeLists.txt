@@ -1,6 +1,7 @@
 set(
     SRCS
     src/lattice_input.c
+    src/lattice_neighbor.c
 )
 
 add_library(

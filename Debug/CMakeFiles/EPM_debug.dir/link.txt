@@ -1,0 +1,1 @@
+/usr/bin/cc  -fopenmp -Wall -g -rdynamic CMakeFiles/EPM_debug.dir/Main/src/main.o -o bin/EPM_debug   -L/media/ze/Tool/EPM/Debug/Control  -L/media/ze/Tool/EPM/Debug/Lattice  -L/media/ze/Tool/EPM/Debug/Reader  -L/media/ze/Tool/EPM/Debug/List  Control/libcontrol.a Lattice/liblattice.a Reader/libreader.a List/liblist.a Control/libcontrol.a -lm 

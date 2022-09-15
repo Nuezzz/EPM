@@ -100,19 +100,35 @@ Lattice/CMakeFiles/lattice.dir/src/lattice_neighbor.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/lattice.dir/src/lattice_neighbor.s"
 	cd /media/ze/Tool/EPM/Debug/Lattice && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /media/ze/Tool/EPM/Lattice/src/lattice_neighbor.c -o CMakeFiles/lattice.dir/src/lattice_neighbor.s
 
+Lattice/CMakeFiles/lattice.dir/src/lattice_Gvec.o: Lattice/CMakeFiles/lattice.dir/flags.make
+Lattice/CMakeFiles/lattice.dir/src/lattice_Gvec.o: ../Lattice/src/lattice_Gvec.c
+Lattice/CMakeFiles/lattice.dir/src/lattice_Gvec.o: Lattice/CMakeFiles/lattice.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object Lattice/CMakeFiles/lattice.dir/src/lattice_Gvec.o"
+	cd /media/ze/Tool/EPM/Debug/Lattice && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT Lattice/CMakeFiles/lattice.dir/src/lattice_Gvec.o -MF CMakeFiles/lattice.dir/src/lattice_Gvec.o.d -o CMakeFiles/lattice.dir/src/lattice_Gvec.o -c /media/ze/Tool/EPM/Lattice/src/lattice_Gvec.c
+
+Lattice/CMakeFiles/lattice.dir/src/lattice_Gvec.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/lattice.dir/src/lattice_Gvec.i"
+	cd /media/ze/Tool/EPM/Debug/Lattice && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /media/ze/Tool/EPM/Lattice/src/lattice_Gvec.c > CMakeFiles/lattice.dir/src/lattice_Gvec.i
+
+Lattice/CMakeFiles/lattice.dir/src/lattice_Gvec.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/lattice.dir/src/lattice_Gvec.s"
+	cd /media/ze/Tool/EPM/Debug/Lattice && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /media/ze/Tool/EPM/Lattice/src/lattice_Gvec.c -o CMakeFiles/lattice.dir/src/lattice_Gvec.s
+
 # Object files for target lattice
 lattice_OBJECTS = \
 "CMakeFiles/lattice.dir/src/lattice_input.o" \
-"CMakeFiles/lattice.dir/src/lattice_neighbor.o"
+"CMakeFiles/lattice.dir/src/lattice_neighbor.o" \
+"CMakeFiles/lattice.dir/src/lattice_Gvec.o"
 
 # External object files for target lattice
 lattice_EXTERNAL_OBJECTS =
 
 Lattice/liblattice.a: Lattice/CMakeFiles/lattice.dir/src/lattice_input.o
 Lattice/liblattice.a: Lattice/CMakeFiles/lattice.dir/src/lattice_neighbor.o
+Lattice/liblattice.a: Lattice/CMakeFiles/lattice.dir/src/lattice_Gvec.o
 Lattice/liblattice.a: Lattice/CMakeFiles/lattice.dir/build.make
 Lattice/liblattice.a: Lattice/CMakeFiles/lattice.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C static library liblattice.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C static library liblattice.a"
 	cd /media/ze/Tool/EPM/Debug/Lattice && $(CMAKE_COMMAND) -P CMakeFiles/lattice.dir/cmake_clean_target.cmake
 	cd /media/ze/Tool/EPM/Debug/Lattice && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/lattice.dir/link.txt --verbose=$(VERBOSE)
 

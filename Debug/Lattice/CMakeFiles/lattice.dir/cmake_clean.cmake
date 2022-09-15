@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/lattice.dir/src/lattice_Gvec.o"
+  "CMakeFiles/lattice.dir/src/lattice_Gvec.o.d"
   "CMakeFiles/lattice.dir/src/lattice_input.o"
   "CMakeFiles/lattice.dir/src/lattice_input.o.d"
   "CMakeFiles/lattice.dir/src/lattice_neighbor.o"

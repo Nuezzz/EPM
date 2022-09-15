@@ -1,6 +1,6 @@
-Lattice/CMakeFiles/lattice.dir/src/lattice_input.o: \
- /media/ze/Tool/EPM/Lattice/src/lattice_input.c \
- /usr/include/stdc-predef.h /usr/include/stdio.h \
+Lattice/CMakeFiles/lattice.dir/src/lattice_Gvec.o: \
+ /media/ze/Tool/EPM/Lattice/src/lattice_Gvec.c /usr/include/stdc-predef.h \
+ /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
@@ -67,8 +67,8 @@ Lattice/CMakeFiles/lattice.dir/src/lattice_input.o: \
  /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
  /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
+ /media/ze/Tool/EPM/Control/include/constants.h \
  /media/ze/Tool/EPM/Control/include/util.h \
  /media/ze/Tool/EPM/Reader/include/reader.h \
  /media/ze/Tool/EPM/List/include/list.h \
- /media/ze/Tool/EPM/Control/include/constants.h \
  /media/ze/Tool/EPM/Lattice/include/atom.h

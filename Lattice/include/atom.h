@@ -42,13 +42,17 @@ typedef struct lattice
     char    *mat_storage;
 
 	double a[3][3]; //lattice vector
+    double b[3][3]; //reciprocal lattice vector
 
     unsigned int n_kstep; // number of strps per k-path
     double Emax; //cut off energy (in Rydberg)
+    double **G_vec;//array of G vectors
 	AtomStack *a_set;// Atom sets
     ParamStack  *pset_storage;
     ParamStack  **pset_array; // array of pointers to the base atom type
 } Lattice;
 
-Lattice *LatticeInitial ( char *title );
+Lattice *LatticeInitial ( char *title, int K_max );
 void    FindNeighbor    (double A_dis, Lattice *l);
+void    PrintGvec       (Lattice *s, char* filename, int N);
+int     BuildG          (Lattice *s, double E_cut,  int Kmax, double *k_vec);

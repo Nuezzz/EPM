@@ -134,6 +134,21 @@ lattice/fast:
 .PHONY : lattice/fast
 
 # target to build an object file
+src/lattice_Gvec.o:
+	cd /media/ze/Tool/EPM/Debug && $(MAKE) $(MAKESILENT) -f Lattice/CMakeFiles/lattice.dir/build.make Lattice/CMakeFiles/lattice.dir/src/lattice_Gvec.o
+.PHONY : src/lattice_Gvec.o
+
+# target to preprocess a source file
+src/lattice_Gvec.i:
+	cd /media/ze/Tool/EPM/Debug && $(MAKE) $(MAKESILENT) -f Lattice/CMakeFiles/lattice.dir/build.make Lattice/CMakeFiles/lattice.dir/src/lattice_Gvec.i
+.PHONY : src/lattice_Gvec.i
+
+# target to generate assembly for a file
+src/lattice_Gvec.s:
+	cd /media/ze/Tool/EPM/Debug && $(MAKE) $(MAKESILENT) -f Lattice/CMakeFiles/lattice.dir/build.make Lattice/CMakeFiles/lattice.dir/src/lattice_Gvec.s
+.PHONY : src/lattice_Gvec.s
+
+# target to build an object file
 src/lattice_input.o:
 	cd /media/ze/Tool/EPM/Debug && $(MAKE) $(MAKESILENT) -f Lattice/CMakeFiles/lattice.dir/build.make Lattice/CMakeFiles/lattice.dir/src/lattice_input.o
 .PHONY : src/lattice_input.o
@@ -172,6 +187,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... lattice"
+	@echo "... src/lattice_Gvec.o"
+	@echo "... src/lattice_Gvec.i"
+	@echo "... src/lattice_Gvec.s"
 	@echo "... src/lattice_input.o"
 	@echo "... src/lattice_input.i"
 	@echo "... src/lattice_input.s"

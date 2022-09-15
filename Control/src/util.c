@@ -7,6 +7,11 @@
 #include "util.h"
 // File defining general utility functions
 //
+double Dot( double *a, double *b){
+    double r=0;
+    r = a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+    return r;
+}
 // Function to print a message and a progress bar on the screen
 // It takes as input a double between 0 and 1
 // message cannot be longer than 54 chars

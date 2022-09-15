@@ -35,7 +35,7 @@ void FindNeighbor (double A_dis, Lattice *l)
 
     for ( NI = 0; NI < n_atom; NI++)
     {
-        for ( NII = 0; NII < n_atom; NII++)
+        for ( NII = NI; NII < n_atom; NII++)
         {
             for (i=-IREP;i<IREP+1;i++)
             {

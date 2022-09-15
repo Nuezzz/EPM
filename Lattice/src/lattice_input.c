@@ -6,6 +6,7 @@
 #include "memory.h"
 #include "util.h"
 #include "reader.h"
+#include "constants.h"
 #include "atom.h"
 
 static inline void ReadLatticeVector( Lattice *s, Reader *fr, double lat_con)
@@ -52,7 +53,13 @@ static inline void ReadAtomNum(Lattice *s, Reader *fr)
 	}
 }
 
-
+/**
+ * @brief Read the atom position and finding the neighbor atoms
+ * 
+ * @param s the lattice pointer
+ * @param fr the reader pointer of the input structure file
+ * @param N  total number of atoms in the lattice
+ */
 static inline void ReadAtomPos(Lattice *s, Reader *fr)
 {
 	Atom *atom;
@@ -97,47 +104,44 @@ static inline void ReadAtomPos(Lattice *s, Reader *fr)
 					// atom->tau[2] = lv[0][2]*tmp[0]+lv[1][2]*tmp[1]+lv[2][2]*tmp[2];
 				}
 		}
-		FindNeighbor (4.0, s);
-		for(k=0, i=0; k<s->n_spe; k++)
+		FindNeighbor (3, s);
+		for(i=0; i<N; i++)
 		{
-			N += s->natom_spe[k];
-				for(; i < N; i++)
+
+				atom= s->a_set->atom_array[i];
+				for (j = 0 ; j < 3; j++)
 				{
-					atom= s->a_set->atom_array[i];
-
-					for (j = 0 ; j < 3; j++)
-					{
-						s0=ReaderGetEntry(fr, 8+i,j);
-						tmp[j]=atof(s0);
-					}
-
-					atom->spe = k;
-					atom->tau[0] = lv[0][0]*tmp[0]+lv[1][0]*tmp[1]+lv[2][0]*tmp[2];
-					atom->tau[1] = lv[0][1]*tmp[0]+lv[1][1]*tmp[1]+lv[2][1]*tmp[2];
-					atom->tau[2] = lv[0][2]*tmp[0]+lv[1][2]*tmp[1]+lv[2][2]*tmp[2];
+					tmp[j]=atom->tau[j];
 				}
-		}
+				atom->tau[0] = lv[0][0]*tmp[0]+lv[1][0]*tmp[1]+lv[2][0]*tmp[2];
+				atom->tau[1] = lv[0][1]*tmp[0]+lv[1][1]*tmp[1]+lv[2][1]*tmp[2];
+				atom->tau[2] = lv[0][2]*tmp[0]+lv[1][2]*tmp[1]+lv[2][2]*tmp[2];
+
+		 }
 	}
 	else
 	{
-		for(k=0, i = 0; k<s->n_spe; k++)
-		{
-			N += s->natom_spe[k];
-				for(; i < N; i++)
-				{
-					atom= s->a_set->atom_array[i];
+		printf("To utilize the neighbor finding function, please use direct position of stoms\n");
+		fflush(stdout);
 
-					for (j = 0 ; j < 3; j++){
-						s0=ReaderGetEntry(fr, 8+i,j);
-						tmp[j]=atof(s0);
-					}
+		// for(k=0, i = 0; k<s->n_spe; k++)
+		// {
+		// 	N += s->natom_spe[k];
+		// 		for(; i < N; i++)
+		// 		{
+		// 			atom= s->a_set->atom_array[i];
 
-					atom->spe = k;
-					atom->tau[0]=tmp[0];
-					atom->tau[1]=tmp[1];
-					atom->tau[2]=tmp[2];
-				}
-		}
+		// 			for (j = 0 ; j < 3; j++){
+		// 				s0=ReaderGetEntry(fr, 8+i,j);
+		// 				tmp[j]=atof(s0);
+		// 			}
+
+		// 			atom->spe = k;
+		// 			atom->tau[0]=tmp[0];
+		// 			atom->tau[1]=tmp[1];
+		// 			atom->tau[2]=tmp[2];
+		// 		}
+		// }
 
 	}
 	
@@ -161,15 +165,49 @@ static inline AtomStack *AsetInitial( unsigned int Nspe, unsigned int *Natomspe)
 	for(int i =0; i<N; i++)
 	{
 		Aset->atom_array[i]=&(Aset->atom_storage[i]);
-		Aset->atom_array[i]->n_neighbor = &(Aset->neigh_storage[i]);
+		Aset->atom_array[i]->n_neighbor = Aset->neigh_storage+i*Nspe;
 	}
 	return Aset;
-
-
 }
+
+static inline void BuildRe( Lattice *s)
+{
+	int i,j;
+	double vol;
+	double a[3][3];
+	double b[3][3];
+
+	for(i=0; i<3; i++)
+	{
+		a[i][0]=s->a[i][0];
+		a[i][1]=s->a[i][1];
+		a[i][2]=s->a[i][2];
+	}
+	
+	b[0][0] = a[1][1]*a[2][2] - a[1][2]*a[2][1];
+	b[0][1] = a[1][2]*a[2][0] - a[1][0]*a[2][2];
+	b[0][2] = a[1][0]*a[2][1] - a[1][1]*a[2][0];
+	
+	b[1][0] = a[2][1]*a[0][2] - a[2][2]*a[0][1];
+	b[1][1] = a[2][2]*a[0][0] - a[2][0]*a[0][2];
+	b[1][2] = a[2][0]*a[0][1] - a[2][1]*a[0][0];
+	
+	b[2][0] = a[0][1]*a[1][2] - a[0][1]*a[1][1];
+	b[2][1] = a[0][2]*a[1][0] - a[0][0]*a[1][2];
+	b[2][2] = a[0][0]*a[1][1] - a[0][1]*a[1][0];
+
+	vol	=	abs(a[1][1]*b[1][1]+a[1][2]*b[1][2]+a[1][0]*b[1][0]);
+	for (i=0; i<3; i++){
+		for (j=0; j<3; j++){
+			s->b[i][j]=b[i][j]*TWOPI/vol;  
+		}
+	}
+}
+
 
 static inline void ReadPoscar	(Lattice *s, char *title )
 {
+	int			N;
 	double		lat_con		=0.0;
 	char 		*filename;
 	char        *name;
@@ -208,19 +246,32 @@ static inline void ReadPoscar	(Lattice *s, char *title )
 	ReadAtomNum(s, fr);
 
 	s->a_set=AsetInitial( s->n_spe, s->natom_spe);
-
 	ReadAtomPos(s, fr);
+	
 
 }
 
-Lattice *LatticeInitial ( char *filename )
+
+static inline void GVecInitial(Lattice *s, int N)
 {
-	char 	*s0;
+	int i,j,k;
+	double *G_bulk;
+  	s->G_vec =  SafeCalloc(N*N*N, sizeof(double *));
+	G_bulk   =  SafeCalloc(3*N*N*N, sizeof(double) );
+	for(i=0; i<N*N*N; i++)
+	{
+		s->G_vec[i] = G_bulk+i*3;
+	}
+
+}
+
+Lattice *LatticeInitial ( char *filename, int K_max )
+{
 	Lattice *L;
 	L = SafeCalloc(1,sizeof(Lattice));
 	ReadPoscar(L, filename);
-	
-	
+	BuildRe(L);
+	GVecInitial(L,K_max);
 	return L;
 
 

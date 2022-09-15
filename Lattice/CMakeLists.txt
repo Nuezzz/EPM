@@ -2,6 +2,7 @@ set(
     SRCS
     src/lattice_input.c
     src/lattice_neighbor.c
+    src/lattice_Gvec.c
 )
 
 add_library(

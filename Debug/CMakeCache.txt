@@ -228,6 +228,18 @@ EXECUTABLE_OUTPUT_PATH:PATH=
 //Single output directory for building all libraries.
 LIBRARY_OUTPUT_PATH:PATH=
 
+//Path to a file.
+L_INCLUDE:PATH=/opt/intel/oneapi/mkl/2022.1.0/include
+
+//Path to a library.
+MKL_CORE_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libmkl_core.so
+
+//Path to a library.
+MKL_GNU_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libmkl_gnu_thread.so
+
+//Path to a library.
+MKL_ILP64_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libmkl_intel_ilp64.so
+
 //CXX compiler flags for OpenMP parallelization
 OpenMP_CXX_FLAGS:STRING=-fopenmp
 
@@ -248,6 +260,12 @@ OpenMP_pthread_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libpthread.a
 
 //Dependencies for the target
 control_LIB_DEPENDS:STATIC=general;m;
+
+//Dependencies for the target
+ham_LIB_DEPENDS:STATIC=general;lattice;general;control;general;lapack_solver;
+
+//Dependencies for the target
+lapack_solver_LIB_DEPENDS:STATIC=general;control;general;/usr/lib/x86_64-linux-gnu/libmkl_core.so;general;/usr/lib/x86_64-linux-gnu/libmkl_gnu_thread.so;general;/usr/lib/x86_64-linux-gnu/libmkl_intel_ilp64.so;
 
 //Dependencies for the target
 lattice_LIB_DEPENDS:STATIC=general;reader;general;control;
@@ -363,7 +381,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=6
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=8
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -412,6 +430,12 @@ FIND_PACKAGE_MESSAGE_DETAILS_OpenMP:INTERNAL=[TRUE][TRUE][c ][v4.5()]
 FIND_PACKAGE_MESSAGE_DETAILS_OpenMP_C:INTERNAL=[-fopenmp][/usr/lib/gcc/x86_64-linux-gnu/11/libgomp.so][/usr/lib/x86_64-linux-gnu/libpthread.a][v4.5()]
 //Details about finding OpenMP_CXX
 FIND_PACKAGE_MESSAGE_DETAILS_OpenMP_CXX:INTERNAL=[-fopenmp][/usr/lib/gcc/x86_64-linux-gnu/11/libgomp.so][/usr/lib/x86_64-linux-gnu/libpthread.a][v4.5()]
+//ADVANCED property for variable: MKL_CORE_LIB
+MKL_CORE_LIB-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: MKL_GNU_LIB
+MKL_GNU_LIB-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: MKL_ILP64_LIB
+MKL_ILP64_LIB-ADVANCED:INTERNAL=1
 //Result of TRY_COMPILE
 OpenMP_COMPILE_RESULT_CXX_fopenmp:INTERNAL=TRUE
 //Result of TRY_COMPILE

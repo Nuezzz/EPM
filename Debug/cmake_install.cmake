@@ -44,10 +44,12 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
+  include("/media/ze/Tool/EPM/Debug/EigenSolverLapack/cmake_install.cmake")
   include("/media/ze/Tool/EPM/Debug/Control/cmake_install.cmake")
   include("/media/ze/Tool/EPM/Debug/List/cmake_install.cmake")
   include("/media/ze/Tool/EPM/Debug/Reader/cmake_install.cmake")
   include("/media/ze/Tool/EPM/Debug/Lattice/cmake_install.cmake")
+  include("/media/ze/Tool/EPM/Debug/Ham/cmake_install.cmake")
   include("/media/ze/Tool/EPM/Debug/Main/cmake_install.cmake")
 
 endif()

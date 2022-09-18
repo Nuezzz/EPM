@@ -133,6 +133,19 @@ EPM_debug/fast:
 .PHONY : EPM_debug/fast
 
 #=============================================================================
+# Target rules for targets named lapack_solver
+
+# Build rule for target.
+lapack_solver: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 lapack_solver
+.PHONY : lapack_solver
+
+# fast build rule for target.
+lapack_solver/fast:
+	$(MAKE) $(MAKESILENT) -f EigenSolverLapack/CMakeFiles/lapack_solver.dir/build.make EigenSolverLapack/CMakeFiles/lapack_solver.dir/build
+.PHONY : lapack_solver/fast
+
+#=============================================================================
 # Target rules for targets named control
 
 # Build rule for target.
@@ -184,6 +197,19 @@ lattice/fast:
 	$(MAKE) $(MAKESILENT) -f Lattice/CMakeFiles/lattice.dir/build.make Lattice/CMakeFiles/lattice.dir/build
 .PHONY : lattice/fast
 
+#=============================================================================
+# Target rules for targets named ham
+
+# Build rule for target.
+ham: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ham
+.PHONY : ham
+
+# fast build rule for target.
+ham/fast:
+	$(MAKE) $(MAKESILENT) -f Ham/CMakeFiles/ham.dir/build.make Ham/CMakeFiles/ham.dir/build
+.PHONY : ham/fast
+
 # target to build an object file
 Main/src/main.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/EPM_debug.dir/build.make CMakeFiles/EPM_debug.dir/Main/src/main.o
@@ -209,6 +235,8 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... EPM_debug"
 	@echo "... control"
+	@echo "... ham"
+	@echo "... lapack_solver"
 	@echo "... lattice"
 	@echo "... list"
 	@echo "... reader"

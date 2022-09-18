@@ -6,6 +6,7 @@
 #include "error.h"
 #include "memory.h"
 #include "util.h"
+#include "ham.h"
 
 //
 //
@@ -28,6 +29,7 @@ int main(int argc, char **argv)
     {
         L = LatticeInitial(argv[1],2*Kmax+1);
         N = BuildG(L, E_cut, Kmax, k);
+        HLocal();
     }
 
     else

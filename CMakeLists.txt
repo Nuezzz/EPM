@@ -29,6 +29,7 @@ set(PATCH_RELEASE 0)
 # Set CMake module and output binary paths.
 # CMake modules will go in "Source/cmake/Modules/"
 # Binary output will go in "build/bin"
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -37,9 +38,11 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # NOTE: This command only works if it comes before the target is added
 add_compile_options(-m64 -std=gnu11)
 ##################################################################################
+message("*****Compiling with Pardiso*****")
+find_package(LAPACK)
 
-set(dirs Control List Reader Lattice Main
-)
+
+set(dirs EigenSolverLapack Control List Reader Lattice Ham Main)
 
 # Find OpenMP installation and set compiler flags
 include(FindOpenMP)
@@ -66,8 +69,8 @@ add_dirs(${dirs})
 ##################################################################################
 if(CMAKE_BUILD_TYPE MATCHES "Release")
     add_executable(EPM_release Main/src/main.c)
-    target_link_libraries(EPM_release control lattice)
+    target_link_libraries(EPM_release control lattice ham)
 elseif(CMAKE_BUILD_TYPE MATCHES "Debug")
     add_executable(EPM_debug Main/src/main.c)
-    target_link_libraries(EPM_debug control lattice)
+    target_link_libraries(EPM_debug control lattice ham)
 endif()

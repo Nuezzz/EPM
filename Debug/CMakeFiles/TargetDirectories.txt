@@ -1,6 +1,9 @@
 /media/ze/Tool/EPM/Debug/CMakeFiles/EPM_debug.dir
 /media/ze/Tool/EPM/Debug/CMakeFiles/edit_cache.dir
 /media/ze/Tool/EPM/Debug/CMakeFiles/rebuild_cache.dir
+/media/ze/Tool/EPM/Debug/EigenSolverLapack/CMakeFiles/lapack_solver.dir
+/media/ze/Tool/EPM/Debug/EigenSolverLapack/CMakeFiles/edit_cache.dir
+/media/ze/Tool/EPM/Debug/EigenSolverLapack/CMakeFiles/rebuild_cache.dir
 /media/ze/Tool/EPM/Debug/Control/CMakeFiles/control.dir
 /media/ze/Tool/EPM/Debug/Control/CMakeFiles/edit_cache.dir
 /media/ze/Tool/EPM/Debug/Control/CMakeFiles/rebuild_cache.dir
@@ -13,5 +16,8 @@
 /media/ze/Tool/EPM/Debug/Lattice/CMakeFiles/lattice.dir
 /media/ze/Tool/EPM/Debug/Lattice/CMakeFiles/edit_cache.dir
 /media/ze/Tool/EPM/Debug/Lattice/CMakeFiles/rebuild_cache.dir
+/media/ze/Tool/EPM/Debug/Ham/CMakeFiles/ham.dir
+/media/ze/Tool/EPM/Debug/Ham/CMakeFiles/edit_cache.dir
+/media/ze/Tool/EPM/Debug/Ham/CMakeFiles/rebuild_cache.dir
 /media/ze/Tool/EPM/Debug/Main/CMakeFiles/edit_cache.dir
 /media/ze/Tool/EPM/Debug/Main/CMakeFiles/rebuild_cache.dir

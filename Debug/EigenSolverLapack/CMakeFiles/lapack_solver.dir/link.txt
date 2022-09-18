@@ -1,0 +1,2 @@
+/usr/bin/ar qc liblapack_solver.a CMakeFiles/lapack_solver.dir/src/lapack_eigen.o
+/usr/bin/ranlib liblapack_solver.a

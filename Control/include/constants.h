@@ -12,6 +12,8 @@
 #define SR3         1.73205080756887729352e+0       // -
 #define ONEBYTHREE  3.33333333333333333333E-1       // -
 #define TWOBYTHREE  6.66666666666666666666E-1       // -
+#define RYD	    	13.6056981	                    //ev
+#define BOHR		5.291772e-11	                //m
 // DERIVED
 #define TWOPI       (2.0e0*PI)                      // [1]
 #define PIHALF      (PI/2.0e0)                      // [1]

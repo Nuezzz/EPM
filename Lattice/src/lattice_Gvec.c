@@ -9,11 +9,13 @@
 #include "reader.h"
 #include "atom.h"
 
-void PrintGvec(Lattice *s, char* filename, int N)
+void PrintGvec(Lattice *s, char* simname, int N)
 {
     FILE *fp;
     int i;
     double mode;
+	char filename[128];
+	sprintf(filename,"%s/G_vectors.csv",simname);
     fp = SafeFOpen(filename, "w");
     for(i=0;i<N;i++)
     {
@@ -21,8 +23,23 @@ void PrintGvec(Lattice *s, char* filename, int N)
         fprintf(fp, "%.15e %.15e %.15e %.15e\n", s->G_vec[i][0],s->G_vec[i][1],s->G_vec[i][2],mode);
     }
     fclose(fp);
-
 }
+
+
+
+/**
+ * @brief Initialize and calloc the arrays for storing eigen value and eigen ectors
+ * 
+ * @param s pointer to lattice 
+ * @param N number of valid G vectors for specific k point
+ */
+static inline void BandInit(Lattice *s, int N)
+{
+  	s->E =  SafeCalloc(N, sizeof(double));
+	s->Phi = SafeCalloc(N*N, sizeof(double complex));
+}
+
+
 /**
  * @brief Build the G vector mesh in reciprcal space for 
  * specific K_vector, within the cutoff energy
@@ -43,6 +60,15 @@ int BuildG(Lattice *s, double E_cut,  int Kmax, double *k_vec)
 	double Gk_mod; // square of length of current G+k vector 
 	double G_max; // square of max length of G vector
 	double b[3][3];//reciprocal lattice vector bases
+
+
+	/*---------------------------------*/
+	FILE *fp;
+    int mode;
+	char filename[128];
+	sprintf(filename,"G_vectors.csv");
+    fp = SafeFOpen(filename, "w");
+	 /******************************/
 
 	G_max = E_cut * IH2M0Q0* 1.0e-20 ;//CONVERT A^-2 to m^-2
 	for(i=0; i<3; i++)
@@ -68,6 +94,9 @@ int BuildG(Lattice *s, double E_cut,  int Kmax, double *k_vec)
 				
 				if(Gk_mod < G_max)
 				{
+					mode=G_int[0]*G_int[0]+G_int[1]*G_int[1]+G_int[2]*G_int[2];
+    				fprintf(fp, "%d, %d, %d, %d, %.15e, %.15e, %.15e, %.15e\n", mode, G_int[0], G_int[1], G_int[2], G_tmp[0]/(2*PI/5.65359),G_tmp[1]/(2*PI/5.65359),G_tmp[2]/(2*PI/5.65359), Gk_mod/(2*PI/5.65359)/(2*PI/5.65359));
+					
 					s->G_vec[NG][0]=G_tmp[0];
 					s->G_vec[NG][1]=G_tmp[1];
 					s->G_vec[NG][2]=G_tmp[2];
@@ -76,5 +105,7 @@ int BuildG(Lattice *s, double E_cut,  int Kmax, double *k_vec)
 			}
 		}
 	}
+	fclose(fp);
+	BandInit(s,NG);
 	return NG;
 }

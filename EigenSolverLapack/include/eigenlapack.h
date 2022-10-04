@@ -6,9 +6,9 @@ Copies the format of umfsolver.h
 #define _PARDISOSOLVER_H
 
 #include "mkl.h"
-#include "complex.h"
+#include <complex.h>
 
-#define PARDISO_DEBUGGING_MSGLVL 0
-void LapackEigenSolve(int NUM_BANDS, int N_RANK, double complex  *A);
-
+int LapackEigenSolve(int NUM_BANDS, int N_RANK, double complex  *A, double *w, double complex *z);
+void print_matrix( char* desc, int m, int n, double complex *a, int lda );
+void print_rmatrix( char* desc, int m, int n, double *a, int lda );
 #endif

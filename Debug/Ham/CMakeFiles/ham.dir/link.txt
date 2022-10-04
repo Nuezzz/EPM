@@ -1,2 +1,2 @@
-/usr/bin/ar qc libham.a CMakeFiles/ham.dir/src/ham_local.o CMakeFiles/ham.dir/src/ham_spin.o
+/usr/bin/ar qc libham.a CMakeFiles/ham.dir/src/ham_local.o CMakeFiles/ham.dir/src/ham_spin.o CMakeFiles/ham.dir/src/ham_tot.o
 /usr/bin/ranlib libham.a

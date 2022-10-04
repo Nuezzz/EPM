@@ -163,6 +163,21 @@ src/ham_spin.s:
 	cd /media/ze/Tool/EPM/Debug && $(MAKE) $(MAKESILENT) -f Ham/CMakeFiles/ham.dir/build.make Ham/CMakeFiles/ham.dir/src/ham_spin.s
 .PHONY : src/ham_spin.s
 
+# target to build an object file
+src/ham_tot.o:
+	cd /media/ze/Tool/EPM/Debug && $(MAKE) $(MAKESILENT) -f Ham/CMakeFiles/ham.dir/build.make Ham/CMakeFiles/ham.dir/src/ham_tot.o
+.PHONY : src/ham_tot.o
+
+# target to preprocess a source file
+src/ham_tot.i:
+	cd /media/ze/Tool/EPM/Debug && $(MAKE) $(MAKESILENT) -f Ham/CMakeFiles/ham.dir/build.make Ham/CMakeFiles/ham.dir/src/ham_tot.i
+.PHONY : src/ham_tot.i
+
+# target to generate assembly for a file
+src/ham_tot.s:
+	cd /media/ze/Tool/EPM/Debug && $(MAKE) $(MAKESILENT) -f Ham/CMakeFiles/ham.dir/build.make Ham/CMakeFiles/ham.dir/src/ham_tot.s
+.PHONY : src/ham_tot.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -178,6 +193,9 @@ help:
 	@echo "... src/ham_spin.o"
 	@echo "... src/ham_spin.i"
 	@echo "... src/ham_spin.s"
+	@echo "... src/ham_tot.o"
+	@echo "... src/ham_tot.i"
+	@echo "... src/ham_tot.s"
 .PHONY : help
 
 

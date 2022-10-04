@@ -2,6 +2,7 @@ set(
     SRCS
     src/ham_local.c
     src/ham_spin.c
+    src/ham_tot.c
 )
 
 add_library(

@@ -100,19 +100,35 @@ Ham/CMakeFiles/ham.dir/src/ham_spin.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/ham.dir/src/ham_spin.s"
 	cd /media/ze/Tool/EPM/Debug/Ham && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /media/ze/Tool/EPM/Ham/src/ham_spin.c -o CMakeFiles/ham.dir/src/ham_spin.s
 
+Ham/CMakeFiles/ham.dir/src/ham_tot.o: Ham/CMakeFiles/ham.dir/flags.make
+Ham/CMakeFiles/ham.dir/src/ham_tot.o: ../Ham/src/ham_tot.c
+Ham/CMakeFiles/ham.dir/src/ham_tot.o: Ham/CMakeFiles/ham.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object Ham/CMakeFiles/ham.dir/src/ham_tot.o"
+	cd /media/ze/Tool/EPM/Debug/Ham && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT Ham/CMakeFiles/ham.dir/src/ham_tot.o -MF CMakeFiles/ham.dir/src/ham_tot.o.d -o CMakeFiles/ham.dir/src/ham_tot.o -c /media/ze/Tool/EPM/Ham/src/ham_tot.c
+
+Ham/CMakeFiles/ham.dir/src/ham_tot.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/ham.dir/src/ham_tot.i"
+	cd /media/ze/Tool/EPM/Debug/Ham && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /media/ze/Tool/EPM/Ham/src/ham_tot.c > CMakeFiles/ham.dir/src/ham_tot.i
+
+Ham/CMakeFiles/ham.dir/src/ham_tot.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/ham.dir/src/ham_tot.s"
+	cd /media/ze/Tool/EPM/Debug/Ham && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /media/ze/Tool/EPM/Ham/src/ham_tot.c -o CMakeFiles/ham.dir/src/ham_tot.s
+
 # Object files for target ham
 ham_OBJECTS = \
 "CMakeFiles/ham.dir/src/ham_local.o" \
-"CMakeFiles/ham.dir/src/ham_spin.o"
+"CMakeFiles/ham.dir/src/ham_spin.o" \
+"CMakeFiles/ham.dir/src/ham_tot.o"
 
 # External object files for target ham
 ham_EXTERNAL_OBJECTS =
 
 Ham/libham.a: Ham/CMakeFiles/ham.dir/src/ham_local.o
 Ham/libham.a: Ham/CMakeFiles/ham.dir/src/ham_spin.o
+Ham/libham.a: Ham/CMakeFiles/ham.dir/src/ham_tot.o
 Ham/libham.a: Ham/CMakeFiles/ham.dir/build.make
 Ham/libham.a: Ham/CMakeFiles/ham.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C static library libham.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C static library libham.a"
 	cd /media/ze/Tool/EPM/Debug/Ham && $(CMAKE_COMMAND) -P CMakeFiles/ham.dir/cmake_clean_target.cmake
 	cd /media/ze/Tool/EPM/Debug/Ham && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ham.dir/link.txt --verbose=$(VERBOSE)
 

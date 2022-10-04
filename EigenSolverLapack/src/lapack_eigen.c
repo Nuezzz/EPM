@@ -12,14 +12,15 @@
 
 #include "eigenlapack.h"
 
-static inline void LapackComplexConvert(double complex *A, lapack_complex_double *a, int rank);
 
-void LapackEigenSolve(int NUM_BANDS, int N_RANK, double complex  *A)
+void print_matrix( char* desc, int m, int n, double complex *a, int lda );
+void print_rmatrix( char* desc, int m, int n, double *a, int lda );
+
+int LapackEigenSolve(int NUM_BANDS, int N_RANK, double complex  *A, double *w, double complex *z)
 {
 
 
 	lapack_int n  		= N_RANK;
-	lapack_complex_double a[N_RANK*N_RANK];
 	lapack_int lda		= N_RANK;
 	double	   vl,vu;
 
@@ -30,16 +31,15 @@ void LapackEigenSolve(int NUM_BANDS, int N_RANK, double complex  *A)
 
 	lapack_int m;
 	lapack_int ldz 	  	= N_RANK;
-	double	   w[ldz];
-	lapack_complex_double z[ldz*NUM_BANDS];
+	
+
 
 	lapack_int ifail[ldz];
 	lapack_int info;
 
-	LapackComplexConvert(A, a ,N_RANK);
-
-	info = LAPACKE_zheevx( LAPACK_ROW_MAJOR, 'N', 'I', 'L', n, a, lda, vl, vu,  il, iu, abstol, &m, w, z, ldz, ifail);
-	//info = LAPACKE_zheevx(  LAPACK_ROW_MAJOR, "V",  "I", "L", n, a, lda, vl, vu, il, iu, abstol, &m, w, z, ldz, ifail );
+	//print_matrix( "Original matrix is (stored columnwise)", n, n, A, ldz );
+	//info = LAPACKE_zheevx( LAPACK_ROW_MAJOR, 'N', 'I', 'L', n, a, lda, vl, vu,  il, iu, abstol, &m, w, z, ldz, ifail);
+	info = LAPACKE_zheevx(  LAPACK_ROW_MAJOR, 'V',  'I', 'L', n, A, lda, vl, vu, il, iu, abstol, &m, w, z, ldz, ifail );
 
 
 	if (info != 0) {
@@ -47,30 +47,27 @@ void LapackEigenSolve(int NUM_BANDS, int N_RANK, double complex  *A)
 		exit(3);
 	}
 
-	2for(int i=0; i<m; i++){
-		printf("the %d eigenvalue is %lf\n",i,w[i]);
-	}
+	return m;
 
 }
 
-/**
- * @brief convert the commplex type into lapack complex type
- * 
- * @param A complex pointer to rank*rank size array
- * @param rank the size of input and outpur array
- * @return lapack_complex_double type of aarray
- */
-static inline void LapackComplexConvert(double complex *A, lapack_complex_double *a, int rank)
-{
-	int i,j;
-	
-	for (i=0; i<rank; i++)
-	{
-		for (j=0; j<rank; j++)
-		{
-			a[i*rank+j].real= creal(A[i*rank+j]);
-			a[i*rank+j].imag= cimag(A[i*rank+j]);
-		}
-	}
-	return a;
+void print_matrix( char* desc, int m, int n, double complex *a, int lda ) {
+        int i, j;
+        printf( "\n %s\n", desc );
+        for( i = 0; i < m; i++ ) {
+                for( j = 0; j < n; j++ )
+                        printf( " (%6.2f,%6.2f)", creal(a[i*lda+j]), cimag(a[i*lda+j]) );
+                printf( "\n" );
+        }
 }
+
+/* Auxiliary routine: printing a real matrix */
+void print_rmatrix( char* desc, int m, int n, double* a, int lda ) {
+        int i, j;
+        printf( "\n %s\n", desc );
+        for( i = 0; i < m; i++ ) {
+                for( j = 0; j < n; j++ ) printf( " %6.2f", a[i*lda+j] );
+                printf( "\n" );
+        }
+}
+

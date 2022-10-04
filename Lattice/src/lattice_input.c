@@ -9,9 +9,10 @@
 #include "constants.h"
 #include "atom.h"
 
-static inline void ReadLatticeVector( Lattice *s, Reader *fr, double lat_con)
+static inline void ReadLatticeVector( Lattice *s, Reader *fr )
 {
 	int	i,j;
+	double lat_con = s->A0;
 	char *s0;
 	for(i = 0; i < 3; i++){
 		
@@ -82,7 +83,7 @@ static inline void ReadAtomPos(Lattice *s, Reader *fr)
 	type = ReaderGetEntry(fr, 7, 0);
 
 	// get type of coordination of atoms position
-	if (strcmp(type, "Direct"))
+	if (!strcmp(type, "Direct"))
 	{
 		for(k=0, i=0; k<s->n_spe; k++)
 		{
@@ -151,7 +152,7 @@ static inline void ReadAtomPos(Lattice *s, Reader *fr)
 static inline AtomStack *AsetInitial( unsigned int Nspe, unsigned int *Natomspe)
 {
 	/*Sum up the total atom number*/
-	AtomStack *Aset;
+	AtomStack *Aset=SafeCalloc(1, sizeof(AtomStack));
 	int N=0;
 	for(int i=0; i<Nspe; i++)
 	{
@@ -161,14 +162,32 @@ static inline AtomStack *AsetInitial( unsigned int Nspe, unsigned int *Natomspe)
 	Aset->n_atoms =N;
 	Aset->atom_storage	= SafeCalloc(N, sizeof(Atom));
 	Aset->atom_array  	= SafeCalloc(N, sizeof(Atom*));
-	Aset->neigh_storage = SafeCalloc(N, sizeof(unsigned int )*Nspe);
 	for(int i =0; i<N; i++)
 	{
 		Aset->atom_array[i]=&(Aset->atom_storage[i]);
-		Aset->atom_array[i]->n_neighbor = Aset->neigh_storage+i*Nspe;
 	}
 	return Aset;
 }
+
+// static inline ParamStack *AsetInitial( unsigned int Nspe, unsigned int *Natomspe)
+// {
+// 	/*Sum up the total atom number*/
+// 	ParamStack *Aset;
+// 	int N=0;
+// 	for(int i=0; i<Nspe; i++)
+// 	{
+// 		N+=Natomspe[i];
+// 	}
+// 	/*Allocate the space accoeding to the atom number*/
+
+// 	Aset->par_storage	= SafeCalloc(N, sizeof(Param));
+// 	Aset->par_array  	= SafeCalloc(N, sizeof(Param*));
+// 	for(int i =0; i<N; i++)
+// 	{
+// 		Aset->par_array[i]=&(Aset->par_storage[i]);
+// 	}
+// 	return Aset;
+// }
 
 static inline void BuildRe( Lattice *s)
 {
@@ -192,11 +211,13 @@ static inline void BuildRe( Lattice *s)
 	b[1][1] = a[2][2]*a[0][0] - a[2][0]*a[0][2];
 	b[1][2] = a[2][0]*a[0][1] - a[2][1]*a[0][0];
 	
-	b[2][0] = a[0][1]*a[1][2] - a[0][1]*a[1][1];
+	b[2][0] = a[0][1]*a[1][2] - a[0][2]*a[1][1];
 	b[2][1] = a[0][2]*a[1][0] - a[0][0]*a[1][2];
 	b[2][2] = a[0][0]*a[1][1] - a[0][1]*a[1][0];
 
 	vol	=	abs(a[1][1]*b[1][1]+a[1][2]*b[1][2]+a[1][0]*b[1][0]);
+	s->vol = vol;
+	
 	for (i=0; i<3; i++){
 		for (j=0; j<3; j++){
 			s->b[i][j]=b[i][j]*TWOPI/vol;  
@@ -207,8 +228,6 @@ static inline void BuildRe( Lattice *s)
 
 static inline void ReadPoscar	(Lattice *s, char *title )
 {
-	int			N;
-	double		lat_con		=0.0;
 	char 		*filename;
 	char        *name;
 	char        *path;
@@ -239,9 +258,9 @@ static inline void ReadPoscar	(Lattice *s, char *title )
 	printf("Lattice %s is used for band structure calculation\n",s0);
 
 	s0 = ReaderGetEntry(fr,1,0);
-	lat_con = atof(s0);
+	s->A0 = atof(s0);
 	
-	ReadLatticeVector(s, fr, lat_con);
+	ReadLatticeVector(s, fr);
 	ReadMatInfo(s, fr );
 	ReadAtomNum(s, fr);
 
@@ -252,9 +271,9 @@ static inline void ReadPoscar	(Lattice *s, char *title )
 }
 
 
-static inline void GVecInitial(Lattice *s, int N)
+static inline void GVecInit(Lattice *s, int N)
 {
-	int i,j,k;
+	int i;
 	double *G_bulk;
   	s->G_vec =  SafeCalloc(N*N*N, sizeof(double *));
 	G_bulk   =  SafeCalloc(3*N*N*N, sizeof(double) );
@@ -271,7 +290,7 @@ Lattice *LatticeInitial ( char *filename, int K_max )
 	L = SafeCalloc(1,sizeof(Lattice));
 	ReadPoscar(L, filename);
 	BuildRe(L);
-	GVecInitial(L,K_max);
+	GVecInit(L,K_max);
 	return L;
 
 

@@ -1,5 +1,5 @@
-Ham/CMakeFiles/ham.dir/src/ham_local.o: \
- /media/ze/Tool/EPM/Ham/src/ham_local.c /usr/include/stdc-predef.h \
+Ham/CMakeFiles/ham.dir/src/ham_tot.o: \
+ /media/ze/Tool/EPM/Ham/src/ham_tot.c /usr/include/stdc-predef.h \
  /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -102,6 +102,7 @@ Ham/CMakeFiles/ham.dir/src/ham_local.o: \
  /usr/include/complex.h /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/cmathcalls.h \
  /media/ze/Tool/EPM/Lattice/include/atom.h \
+ /media/ze/Tool/EPM/Control/include/util.h \
  /media/ze/Tool/EPM/Control/include/memory.h /usr/include/unistd.h \
  /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
  /usr/include/x86_64-linux-gnu/bits/environments.h \
@@ -109,5 +110,4 @@ Ham/CMakeFiles/ham.dir/src/ham_local.o: \
  /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
  /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
- /media/ze/Tool/EPM/Control/include/util.h \
  /media/ze/Tool/EPM/Control/include/constants.h

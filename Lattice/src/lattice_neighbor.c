@@ -8,25 +8,58 @@
 #include "reader.h"
 #include "atom.h"
 
+static inline void RecordNeighbor (Lattice *l, unsigned int **neigh)
+{
+    char    *bond;
+    int     i,j,k;
+    int     n_atom = l->a_set->n_atoms;
+    Atom    **atoms= l->a_set->atom_array;
+    for(i=0;i<n_atom; i++)
+    {
+        for(k=0, j=0; j<l->n_spe; j++)
+        {
+            if(neigh[i][j]!= 0)   k++;
+            
+        }
+        atoms[i]->neighbor_spe  =  SafeCalloc(k, sizeof(unsigned int));
+        atoms[i]->n_neighbor    =  SafeCalloc(k, sizeof(unsigned int));
+        atoms[i]->n_spe         = k;
+        for(k=0, j=0; j<l->n_spe; j++)
+        {
+            if(neigh[i][j]!= 0)
+            {
+                atoms[i]->neighbor_spe[k] = j;
+                atoms[i]->n_neighbor[k]   = neigh[i][j];
+                k++;
+            }
+        }
+        
+    }
+}
+
+
 void FindNeighbor (double A_dis, Lattice *l)
 {
     int     i,j,k,IREP,NI,NII;
-    int     n_atom = 0;
+    int     n_atom = l->a_set->n_atoms;
     double  DX,DY,DZ,D,DIS;
     double  a_vec[3][3];
     double  tmp[3];
+    unsigned int **neigh;
     Atom **atoms= l->a_set->atom_array;
 
+    neigh = SafeCalloc(n_atom, sizeof(unsigned int*));
+    for(i=0; i<n_atom; i++)
+    {
+        neigh[i] = SafeCalloc(l->n_spe, sizeof(unsigned int));
+    }
     a_vec[0][0]= l->a[0][0]; a_vec[0][1]= l->a[0][1]; a_vec[0][2]= l->a[0][2];
     a_vec[1][0]= l->a[1][0]; a_vec[1][1]= l->a[1][1]; a_vec[1][2]= l->a[1][2];
     a_vec[2][0]= l->a[2][0]; a_vec[2][1]= l->a[2][1]; a_vec[2][2]= l->a[2][2];
 
     DIS= pow(A_dis, 2.0);
 
-    for(i=0; i<l->n_spe; i++)
-    {
-        n_atom+=l->natom_spe[i];
-    }
+
     // Search all the 8 nearest cells for system smaller than 1000 
     if(n_atom<1000)
         IREP=1;
@@ -54,8 +87,8 @@ void FindNeighbor (double A_dis, Lattice *l)
 
                         if (NII!=NI && D < DIS )
                         {
-                            atoms[NI]->n_neighbor[atoms[NII]->spe]++;
-                            atoms[NII]->n_neighbor[atoms[NI]->spe]++;
+                            neigh[NI][atoms[NII]->spe]++;
+                            neigh[NII][atoms[NI]->spe]++;
                         }
             
                     }
@@ -64,5 +97,6 @@ void FindNeighbor (double A_dis, Lattice *l)
         }
         
     }
+    RecordNeighbor (l, neigh);
 
 }

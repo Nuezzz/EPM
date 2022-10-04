@@ -29,6 +29,8 @@ char *GetToken(char *str,int i);
 char *NextToken(char *str);
 //
 void StrExtTrim(char **string);
+
+double Dot( double *a, double *b);
 //
 //
 #endif

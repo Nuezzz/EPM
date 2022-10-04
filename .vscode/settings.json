@@ -4,6 +4,15 @@
         "memory.h": "c",
         "util.h": "c",
         "atom.h": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "array": "c",
+        "chrono": "c",
+        "compare": "c",
+        "functional": "c",
+        "memory_resource": "c",
+        "ratio": "c",
+        "tuple": "c",
+        "utility": "c",
+        "stdlib.h": "c"
     }
 }

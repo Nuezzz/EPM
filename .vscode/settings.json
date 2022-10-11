@@ -13,6 +13,9 @@
         "ratio": "c",
         "tuple": "c",
         "utility": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "thread": "c",
+        "bitset": "c",
+        "algorithm": "c"
     }
 }

@@ -9,7 +9,7 @@
 #include "reader.h"
 #include "atom.h"
 
-void PrintGvec(Lattice *s, char* simname, int N)
+void PrintGvec(Eigen *s, char* simname, int N)
 {
     FILE *fp;
     int i;
@@ -33,11 +33,13 @@ void PrintGvec(Lattice *s, char* simname, int N)
  * @param s pointer to lattice 
  * @param N number of valid G vectors for specific k point
  */
-static inline void BandInit(Lattice *s, int N)
+static inline void BandInit(Eigen *s, int N)
 {
   	s->E =  SafeCalloc(N, sizeof(double));
 	s->Phi = SafeCalloc(N*N, sizeof(double complex));
 }
+
+
 
 
 /**
@@ -49,7 +51,7 @@ static inline void BandInit(Lattice *s, int N)
  * @param Kmax  maximun of G vector index
  * @param k_vec pointer of k_vector use as the center of G vector
  */
-int BuildG(Lattice *s, double E_cut,  int Kmax, double *k_vec)
+static inline int BuildG(Lattice *s,Eigen *d, double E_cut,  int Kmax)
 {
 	int i,j,k;
 
@@ -60,14 +62,14 @@ int BuildG(Lattice *s, double E_cut,  int Kmax, double *k_vec)
 	double Gk_mod; // square of length of current G+k vector 
 	double G_max; // square of max length of G vector
 	double b[3][3];//reciprocal lattice vector bases
-
-
+	double *G_bulk   =  SafeCalloc(3*Kmax*Kmax*Kmax, sizeof(double) );
+	
 	/*---------------------------------*/
-	FILE *fp;
-    int mode;
-	char filename[128];
-	sprintf(filename,"G_vectors.csv");
-    fp = SafeFOpen(filename, "w");
+	// FILE *fp;
+    // int mode;
+	// char filename[128];
+	// sprintf(filename,"G_vectors.csv");
+    // fp = SafeFOpen(filename, "w");
 	 /******************************/
 
 	G_max = E_cut * IH2M0Q0* 1.0e-20 ;//CONVERT A^-2 to m^-2
@@ -77,6 +79,9 @@ int BuildG(Lattice *s, double E_cut,  int Kmax, double *k_vec)
 		b[i][1]=s->b[i][1];
 		b[i][2]=s->b[i][2];
 	}
+	#ifdef _OPENMP
+    #pragma omp parallel for schedule(static)  private(j,k,G_int,G_tmp,Gk_mod) reduction(+:NG)
+    #endif
 	for(i=0; i<2*Kmax+1; i++)
 	{
 		G_int[0]=i-Kmax;
@@ -90,22 +95,53 @@ int BuildG(Lattice *s, double E_cut,  int Kmax, double *k_vec)
 				G_tmp[1] = G_int[0]*b[0][1]+G_int[1]*b[1][1]+G_int[2]*b[2][1];
 				G_tmp[2] = G_int[0]*b[0][2]+G_int[1]*b[1][2]+G_int[2]*b[2][2];
 
-				Gk_mod= (G_tmp[0]+k_vec[0])*(G_tmp[0]+k_vec[0])+(G_tmp[1]+k_vec[1])*(G_tmp[1]+k_vec[1])+(G_tmp[2]+k_vec[2])*(G_tmp[2]+k_vec[2]);
+				Gk_mod= (G_tmp[0]+d->k_vec[0])*(G_tmp[0]+d->k_vec[0])+(G_tmp[1]+d->k_vec[1])*(G_tmp[1]+d->k_vec[1])+(G_tmp[2]+d->k_vec[2])*(G_tmp[2]+d->k_vec[2]);
 				
 				if(Gk_mod < G_max)
 				{
-					mode=G_int[0]*G_int[0]+G_int[1]*G_int[1]+G_int[2]*G_int[2];
-    				fprintf(fp, "%d, %d, %d, %d, %.15e, %.15e, %.15e, %.15e\n", mode, G_int[0], G_int[1], G_int[2], G_tmp[0]/(2*PI/5.65359),G_tmp[1]/(2*PI/5.65359),G_tmp[2]/(2*PI/5.65359), Gk_mod/(2*PI/5.65359)/(2*PI/5.65359));
+					//mode=G_int[0]*G_int[0]+G_int[1]*G_int[1]+G_int[2]*G_int[2];
+    				//fprintf(fp, "%d, %d, %d, %d, %.15e, %.15e, %.15e, %.15e\n", mode, G_int[0], G_int[1], G_int[2], G_tmp[0]/(2*PI/5.65359),G_tmp[1]/(2*PI/5.65359),G_tmp[2]/(2*PI/5.65359), Gk_mod/(2*PI/5.65359)/(2*PI/5.65359));
 					
-					s->G_vec[NG][0]=G_tmp[0];
-					s->G_vec[NG][1]=G_tmp[1];
-					s->G_vec[NG][2]=G_tmp[2];
-					NG ++;
+					G_bulk[NG*3+0]=G_tmp[0];
+					G_bulk[NG*3+1]=G_tmp[1];
+					G_bulk[NG*3+2]=G_tmp[2];
+					NG += 1;
 				}
 			}
 		}
 	}
-	fclose(fp);
-	BandInit(s,NG);
+
+	d->G_vec =  SafeCalloc(NG, sizeof(double *));
+	#ifdef _OPENMP
+    #pragma omp parallel for schedule(static)
+    #endif
+	for ( i = 0; i < NG; i++)
+	{
+		d->G_vec[i]=G_bulk+i*3;
+	}
+	
+	//fclose(fp);
+	BandInit(d,NG);
 	return NG;
+}
+
+
+/**
+ * @brief Build the reciprocal lattice mesh within the cut off, initialize 
+ * the eigen energy and eigen fucntion storage
+ * 
+ * @param L lattice pointer that has already been fulfilled
+ * @param K_max maximun number of k vector nodes in one direction, typically larger than  11
+ * @param NG pointer to output the number of G_Vec within the cut off
+ * @param k_vec pointer to pass the central k_vec
+ * @param E_cut cut off energy
+ * @return Eigen* 
+ */
+Eigen *GVecInit( Lattice *L, int K_max,double *k_vec, double E_cut)
+{
+	Eigen *s=SafeCalloc(1, sizeof(Eigen));
+	int N = 2*K_max*((int)pow(L->a_set->n_atoms,1.0/3.0)+1)+1;
+	s->k_vec[0]=k_vec[0]; s->k_vec[1]=k_vec[1]; s->k_vec[2]=k_vec[2];
+	s->NG= BuildG(L,s,E_cut,N);
+	return s;
 }

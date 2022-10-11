@@ -218,8 +218,10 @@ static inline void BuildRe( Lattice *s)
 	vol	=	abs(a[1][1]*b[1][1]+a[1][2]*b[1][2]+a[1][0]*b[1][0]);
 	s->vol = vol;
 	
-	for (i=0; i<3; i++){
-		for (j=0; j<3; j++){
+	for (i=0; i<3; i++)
+	{
+		for (j=0; j<3; j++)
+		{
 			s->b[i][j]=b[i][j]*TWOPI/vol;  
 		}
 	}
@@ -271,27 +273,13 @@ static inline void ReadPoscar	(Lattice *s, char *title )
 }
 
 
-static inline void GVecInit(Lattice *s, int N)
-{
-	int i;
-	double *G_bulk;
-  	s->G_vec =  SafeCalloc(N*N*N, sizeof(double *));
-	G_bulk   =  SafeCalloc(3*N*N*N, sizeof(double) );
-	for(i=0; i<N*N*N; i++)
-	{
-		s->G_vec[i] = G_bulk+i*3;
-	}
 
-}
 
-Lattice *LatticeInitial ( char *filename, int K_max )
+Lattice *LatticeInitial ( char *filename )
 {
 	Lattice *L;
 	L = SafeCalloc(1,sizeof(Lattice));
 	ReadPoscar(L, filename);
 	BuildRe(L);
-	GVecInit(L,K_max);
 	return L;
-
-
 }

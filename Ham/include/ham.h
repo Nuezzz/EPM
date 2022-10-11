@@ -6,14 +6,14 @@
 #include <complex.h>
 
 
-double complex *HLocal(Lattice *s, int NG );
-double complex  *HTot ( Lattice *s, int NG, double *Kvec);
-int CalcBand( Lattice *s, double *Kvec, int NG, int bands);
+double complex *HLocal  (Lattice *s, Eigen *d);
+double complex  *HTot   ( Lattice *s, Eigen *d, double *Kvec);
+int CalcBand            (Eigen *d, double complex *H, int bands);
 
-void  PrintEigen(FILE *fp, double *E, double *k, int N);
-FILE  *OpenBandFile( char* simname);
+void  PrintEigen        (FILE *fp, double *E, double *k, int N);
+FILE  *OpenBandFile     ( char* simname);
 
 
 
-void PPtest(Lattice *s,char* simname);
+void PPtest             (Lattice *s,char* simname);
 #endif

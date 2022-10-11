@@ -38,7 +38,8 @@ static inline FILE *OpenPPFile( char* simname)
  */
 static inline double FormFactor( unsigned int i, unsigned int j, Lattice *s, double q_norm)
 {
-    double Omega = 2.0e-30*s->vol/pow(BOHR,3.00)/s->a_set->n_atoms;	/* atomic volume, i.e. fcc cube/4	*/
+    ///double Omega = 2.0e-30*s->vol/pow(BOHR,3.00)/s->a_set->n_atoms;	/* atomic volume, i.e. fcc cube/4	*/
+    double Omega = 1.0e-30*s->vol/pow(BOHR,3.00);
     double Va;	/* the atomic potential			*/
     char *bond;
     StringClone(bond, s->mat_name[i]);
@@ -50,6 +51,7 @@ static inline double FormFactor( unsigned int i, unsigned int j, Lattice *s, dou
             +0.0464357*exp(-0.574047*pow((q_norm-2.01935),2))
             -0.0133385*exp(-11.2708*pow((q_norm-2.93581),2)) 
             )*131.4/Omega;
+        free(bond);
         return(Va*RYD);		/* factor converts Rydberg --> eV */
      }
 
@@ -60,8 +62,11 @@ static inline double FormFactor( unsigned int i, unsigned int j, Lattice *s, dou
             -0.0434312*exp(-2.94679*pow((q_norm-0.851644),2))
             +0.10569*exp(-0.820922*pow((q_norm-1.22436),2))
             )*145.2/Omega;
+        free(bond);
         return(Va*RYD);		/* factor converts Rydberg --> eV */
      }
+     free(bond);
+     return 0;
 
 }
 
@@ -69,8 +74,8 @@ void PPtest(Lattice *s,char* simname)
 {
     FILE *fp = OpenPPFile(simname);
     double Vf1,Vf0;
-    double max  = 6.0;
-    double step = max/100.0;
+   // double max  = 6.0;
+    //double step = max/100.0;
     double q[4];
     q[0]=sqrt(3);
     q[1]=sqrt(4);
@@ -79,47 +84,96 @@ void PPtest(Lattice *s,char* simname)
     fprintf(fp,"%.9e \n ",2.0e-30*s->vol/pow(BOHR,3.00)/s->a_set->n_atoms);
     for (int i=0; i<4; i++)
     {
-        Vf1 = FormFactor(1,0,s,q[i]*2*PI/5.65359*1.0e10*BOHR);
-        Vf0 = FormFactor(0,1,s,q[i]*2*PI/5.65359*1.0e10*BOHR);
+        Vf1 = FormFactor(1,0,s,q[i]*2*PI/s->A0*1.0e10*BOHR);
+        Vf0 = FormFactor(0,1,s,q[i]*2*PI/s->A0*1.0e10*BOHR);
         fprintf(fp," %.9e, %.9e, %.9e \n",q[i],Vf0,Vf1);
     }
     fclose(fp);
 }
 
-static inline double *PotentialMix(Lattice *s,double q_sqr)
+// static inline double complex PotentialMix(Lattice *s,double *q)
+// {
+//     Atom **atoms= s->a_set->atom_array;
+//     int n_atom=s->a_set->n_atoms;
+//     int n_spe =s->n_spe;
+//     int i,j;
+//     double pot; 
+//     double complex V_loc;
+//     double Vf[n_spe][n_spe];
+
+//     double q_sqr = sqrt(Dot(q,q))*1.0e10*BOHR; // in unit of 1/Bohr
+//     for( i=0; i<n_spe; i++)
+//         for ( j = 0; j < n_spe; j++)
+//         {
+//             //Vf[i][j]= (i==j)? 0.0:FormFactor(i,j,s,q_sqr);
+//             Vf[i][j]= 1;
+//         }
+        
+
+//     for( i=0; i<n_atom; i++)
+//     {
+//         pot = 0;
+//         for( j=0; j < atoms[i]->n_spe ; j++)
+//         {
+//             pot+=Vf[atoms[i]->spe][atoms[i]->neighbor_spe[j]]*atoms[i]->n_neighbor[j];
+//         }
+//         V_loc += cexp(-I*Dot(q,atoms[i]->tau))*pot/4.0;
+        
+//     }
+
+//     return V_loc;
+// }
+
+
+static inline void PotentialMix(Lattice *s,double q[3], double complex *V_loc, int m, int n, int NG)
+// Mysteriously you when you return a double complex type, the value is totally wrong, so I pass the 
+// address to the function and do the assignment inside the function
 {
+
+    double q_sqr = sqrt(Dot(q,q))*1.0e10*BOHR; // in unit of 1/Bohr
+
     Atom **atoms= s->a_set->atom_array;
     int n_atom=s->a_set->n_atoms;
-    double *pot;
-    pot = SafeCalloc(n_atom, sizeof( double));
+    int n_spe =s->n_spe;
+    // double pot[n_atom];
+    double pot;
+    double Vf[n_spe][n_spe];
+
+    for(int i=0; i<n_spe; i++)
+        for (int j = 0; j < n_spe; j++)
+        {
+            Vf[i][j]= (i==j)? 0.0:FormFactor(i,j,s,q_sqr);
+            //Vf[i][j]= 1;
+        }
 
     for (int i=0; i<n_atom;i++ )
     {
+        pot =0;
         for(int j=0; j < atoms[i]->n_spe ; j++)
         {
-            pot[i]+=FormFactor(atoms[i]->spe,atoms[i]->neighbor_spe[j],s,q_sqr)*atoms[i]->n_neighbor[j];
+            //pot[i]+=Vf[atoms[i]->spe][atoms[i]->neighbor_spe[j]]*atoms[i]->n_neighbor[j];
+            pot+=Vf[atoms[i]->spe][atoms[i]->neighbor_spe[j]]*atoms[i]->n_neighbor[j];
         }
-        pot[i]/=4;
+        //pot[i]/=4;
+        pot/=4;
+       // V_loc[m*NG+n] += cexp(-I*Dot(q,atoms[i]->tau))*pot[i];
+       V_loc[m*NG+n] += cexp(-I*Dot(q,atoms[i]->tau))*pot;
     }
 
-    return pot;
 }
 
-
-
-double complex *HLocal(Lattice *s, int NG)
+double complex *HLocal(Lattice *s, Eigen *d)
 {
-    Atom **atoms= s->a_set->atom_array;
-    double **G_vec = s->G_vec;
-    double *V_hyb ;
+    int     NG =d->NG;
+    double  **G_vec = d->G_vec;
     double complex *V_loc  = SafeCalloc(NG*NG, sizeof(double complex));
-    int i,j,k;
-    int N = s->a_set->n_atoms;
+    int i,j;
     double q[3]={0,0,0};
-    
-    double q_sqr;
 
 
+    #ifdef _OPENMP
+    #pragma omp parallel for schedule(dynamic)  private(j,q)
+    #endif
     for(i=0;i<NG;i++)
     {
         for(j=0;j<i;j++)
@@ -127,12 +181,9 @@ double complex *HLocal(Lattice *s, int NG)
             q[0]=G_vec[i][0]-G_vec[j][0];
             q[1]=G_vec[i][1]-G_vec[j][1];
             q[2]=G_vec[i][2]-G_vec[j][2];
-            q_sqr = sqrt(Dot(q,q))*1.0e10*BOHR; // in unit of 1/Bohr
-            V_hyb = PotentialMix(s,q_sqr);
-            for(k=0;k<N;k++)
-            {
-                V_loc[i*NG+j] += cexp(-I*Dot(q,atoms[k]->tau))*V_hyb[k];
-            }
+
+            PotentialMix(s,q,V_loc,i,j,NG);
+
 
         }
     }

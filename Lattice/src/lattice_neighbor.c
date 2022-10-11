@@ -10,7 +10,6 @@
 
 static inline void RecordNeighbor (Lattice *l, unsigned int **neigh)
 {
-    char    *bond;
     int     i,j,k;
     int     n_atom = l->a_set->n_atoms;
     Atom    **atoms= l->a_set->atom_array;
@@ -66,6 +65,9 @@ void FindNeighbor (double A_dis, Lattice *l)
     else
         IREP=0;
 
+    #ifdef _OPENMP
+    #pragma omp parallel for schedule(static)  private(NII,i,j,k,DX,DY,DZ,tmp,D)
+    #endif
     for ( NI = 0; NI < n_atom; NI++)
     {
         for ( NII = NI; NII < n_atom; NII++)
@@ -87,8 +89,12 @@ void FindNeighbor (double A_dis, Lattice *l)
 
                         if (NII!=NI && D < DIS )
                         {
-                            neigh[NI][atoms[NII]->spe]++;
-                            neigh[NII][atoms[NI]->spe]++;
+                            #pragma omp critical
+                            {
+                                neigh[NI][atoms[NII]->spe]++;
+                                neigh[NII][atoms[NI]->spe]++;
+                            }
+
                         }
             
                     }

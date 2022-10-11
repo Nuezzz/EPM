@@ -9,13 +9,14 @@
 
 
 
-double complex *HTot ( Lattice *s, int NG, double *Kvec)
+double complex *HTot ( Lattice *s, Eigen *d, double *Kvec)
 {
     int i,j;
+    int NG = d->NG;
     double GpK[3];
-    double **G_vec = s->G_vec;
+    double **G_vec = d->G_vec;
     double complex *H =  SafeCalloc(NG*NG, sizeof( double complex ));
-    double complex *V_loc= HLocal(s, NG);
+    double complex *V_loc= HLocal(s, d);
 
     // Declare variables for eigen solver
 
@@ -23,6 +24,7 @@ double complex *HTot ( Lattice *s, int NG, double *Kvec)
     // double complex Z[NG*NG];
 
 
+    // could use memcopy to save time
     for(i=0; i< NG; i++)
     {
         for(j=0; j< NG; j++)
@@ -30,6 +32,9 @@ double complex *HTot ( Lattice *s, int NG, double *Kvec)
             H[i*NG+j] = V_loc[i*NG+j];
         }
     }
+    #ifdef _OPENMP
+    #pragma omp parallel for schedule(static)  private(GpK)
+    #endif
     for(i=0; i< NG; i++)
     {
         GpK[0]= G_vec[i][0]+Kvec[0];
@@ -47,20 +52,18 @@ double complex *HTot ( Lattice *s, int NG, double *Kvec)
 /**
  * @brief Calculate the eigen energy and eigen vector of vertain k point
  * 
- * @param s the lattice pointer
- * @param NG Number of valid G vectors within cutoff energy
- * @param Kvec k point in the reciprocal space
- * @param bands Number of selected bands needs to be calculated
+ * @param d pointer to the structure d that contains G_vector mesh and storage for eigen value, eigen vector
+ * @param H hamitonial matrix
  * @return number of bands calulated
  */
-int CalcBand( Lattice *s, double *Kvec, int NG, int bands)
+int CalcBand(Eigen *d, double complex *H, int bands)
 {
     int     m;
-    double	   *w= s->E;
-    double complex *Z= s->Phi;
-    double complex *H = HTot(s,NG,Kvec);
+    double	   *w= d->E;
+    double complex *Z= d->Phi;
+
     //print_matrix( "Selected eigenvectors (stored columnwise)", NG, NG, H, NG);
-    m = LapackEigenSolve(bands, NG, H, w, Z);
+    m = LapackEigenSolve(bands, d->NG, H, w, Z);
 
     return m;
 

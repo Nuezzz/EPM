@@ -1,6 +1,7 @@
 #ifndef _LATTICE
 #define _LATTICE
 
+#include "constants.h"
 #include <complex.h>
 typedef struct atom
 {
@@ -55,19 +56,29 @@ typedef struct lattice
 
     unsigned int n_kstep; // number of strps per k-path
     double Emax; //cut off energy (in Rydberg)
-    double **G_vec;//array of G vectors
 
-    double complex *Phi;//eigen State
-    double          *E;// eigen energy
 
 	AtomStack   *a_set;// Atom sets
     // ParamStack  *pset_storage;
     // ParamStack  **pset_array; // array of pointers to the base atom type
 } Lattice;
 
-Lattice *LatticeInitial ( char *title, int K_max );
+typedef struct eigen
+{
+    int    NG;//number of G_vectors
+    double **G_vec;//array of G vectors
+    double k_vec[3]; //k_vector point to the central of G-mesh
+    double complex *Phi;//eigen State
+    double          *E;// eigen energy
+} Eigen;
+
+
+
+
+Lattice *LatticeInitial ( char *title );
 void    FindNeighbor    (double A_dis, Lattice *l);
-void    PrintGvec       (Lattice *s, char* filename, int N);
-int     BuildG          (Lattice *s, double E_cut,  int Kmax, double *k_vec);
+void    PrintGvec       (Eigen *s, char* filename, int N);
+Eigen  *GVecInit        ( Lattice *L, int K_max, double *k_vec, double E_cut);
+
 
 #endif 

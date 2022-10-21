@@ -71,4 +71,8 @@ Lattice/CMakeFiles/lattice.dir/src/lattice_neighbor.o: \
  /media/ze/Tool/EPM/Reader/include/reader.h \
  /media/ze/Tool/EPM/List/include/list.h \
  /media/ze/Tool/EPM/Lattice/include/atom.h \
- /media/ze/Tool/EPM/Control/include/constants.h
+ /media/ze/Tool/EPM/Control/include/constants.h \
+ /media/ze/Tool/EPM/Control/include/timer.h /usr/include/time.h \
+ /usr/include/x86_64-linux-gnu/bits/time.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h

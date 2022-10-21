@@ -35,11 +35,23 @@ void PrintGvec(Eigen *s, char* simname, int N)
  */
 static inline void BandInit(Eigen *s, int N)
 {
-  	s->E =  SafeCalloc(N, sizeof(double));
-	s->Phi = SafeCalloc(N*N, sizeof(double complex));
+	s->G_vec 	=  SafeCalloc(N, sizeof(double*));
+	s->G_stack 	=  SafeCalloc(3*N, sizeof(double));
+	for(int i=0;i<N;i++)
+	{
+		s->G_vec[i]=s->G_stack+3*i;
+	}
+  	s->E 		=  SafeCalloc(N, sizeof(double));
+	s->Phi 		=  SafeCalloc(N*N, sizeof(double complex));
 }
 
-
+void BandFinish(Eigen *s)
+{
+	free(s->G_vec);
+	free(s->G_stack);
+	free(s->E);
+	free(s->Phi);
+}
 
 
 /**
@@ -111,17 +123,19 @@ static inline int BuildG(Lattice *s,Eigen *d, double E_cut,  int Kmax)
 		}
 	}
 
-	d->G_vec =  SafeCalloc(NG, sizeof(double *));
+	BandInit(d,NG);
 	#ifdef _OPENMP
     #pragma omp parallel for schedule(static)
     #endif
 	for ( i = 0; i < NG; i++)
 	{
-		d->G_vec[i]=G_bulk+i*3;
+		d->G_vec[i][0]=G_bulk[i*3+0];
+		d->G_vec[i][1]=G_bulk[i*3+1];
+		d->G_vec[i][2]=G_bulk[i*3+2];
 	}
 	
 	//fclose(fp);
-	BandInit(d,NG);
+	free(G_bulk);
 	return NG;
 }
 
@@ -143,5 +157,11 @@ Eigen *GVecInit( Lattice *L, int K_max,double *k_vec, double E_cut)
 	int N = 2*K_max*((int)pow(L->a_set->n_atoms,1.0/3.0)+1)+1;
 	s->k_vec[0]=k_vec[0]; s->k_vec[1]=k_vec[1]; s->k_vec[2]=k_vec[2];
 	s->NG= BuildG(L,s,E_cut,N);
+
+	if(s->NG ==  0)
+	{
+		printf(" Fail to select the G_mesh \n");
+		exit(3);
+	}
 	return s;
 }

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcontrol.a CMakeFiles/control.dir/src/openmp.o CMakeFiles/control.dir/src/timer.o CMakeFiles/control.dir/src/error.o CMakeFiles/control.dir/src/memory.o CMakeFiles/control.dir/src/util.o CMakeFiles/control.dir/src/vectormap.o
+/usr/bin/ranlib libcontrol.a

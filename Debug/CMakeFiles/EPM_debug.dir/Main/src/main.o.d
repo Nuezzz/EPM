@@ -56,7 +56,8 @@ CMakeFiles/EPM_debug.dir/Main/src/main.o: \
  /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
  /media/ze/Tool/EPM/Control/include/openmp.h \
  /media/ze/Tool/EPM/Lattice/include/atom.h \
- /media/ze/Tool/EPM/Control/include/constants.h /usr/include/complex.h \
+ /media/ze/Tool/EPM/Control/include/constants.h \
+ /media/ze/Tool/EPM/Control/include/timer.h /usr/include/complex.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/cmathcalls.h \
  /media/ze/Tool/EPM/Control/include/error.h \

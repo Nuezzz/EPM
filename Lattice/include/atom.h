@@ -2,6 +2,7 @@
 #define _LATTICE
 
 #include "constants.h"
+#include "timer.h"
 #include <complex.h>
 typedef struct atom
 {
@@ -58,6 +59,9 @@ typedef struct lattice
     double Emax; //cut off energy (in Rydberg)
 
 
+    Timer Form_time;
+    Timer Solve_time;
+
 	AtomStack   *a_set;// Atom sets
     // ParamStack  *pset_storage;
     // ParamStack  **pset_array; // array of pointers to the base atom type
@@ -67,6 +71,7 @@ typedef struct eigen
 {
     int    NG;//number of G_vectors
     double **G_vec;//array of G vectors
+    double *G_stack;
     double k_vec[3]; //k_vector point to the central of G-mesh
     double complex *Phi;//eigen State
     double          *E;// eigen energy
@@ -79,6 +84,5 @@ Lattice *LatticeInitial ( char *title );
 void    FindNeighbor    (double A_dis, Lattice *l);
 void    PrintGvec       (Eigen *s, char* filename, int N);
 Eigen  *GVecInit        ( Lattice *L, int K_max, double *k_vec, double E_cut);
-
-
+void    BandFinish      (Eigen *s);
 #endif 

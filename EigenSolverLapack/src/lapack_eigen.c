@@ -19,7 +19,6 @@ void print_rmatrix( char* desc, int m, int n, double *a, int lda );
 int LapackEigenSolve(int NUM_BANDS, int N_RANK, double complex  *A, double *w, double complex *z)
 {
 
-
 	lapack_int n  		= N_RANK;
 	lapack_int lda		= N_RANK;
 	double	   vl,vu;
@@ -32,8 +31,6 @@ int LapackEigenSolve(int NUM_BANDS, int N_RANK, double complex  *A, double *w, d
 	lapack_int m;
 	lapack_int ldz 	  	= N_RANK;
 	
-
-
 	lapack_int ifail[ldz];
 	lapack_int info;
 

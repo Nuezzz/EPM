@@ -7,7 +7,7 @@
 
 
 double complex *HLocal  (Lattice *s, Eigen *d);
-double complex  *HTot   ( Lattice *s, Eigen *d, double *Kvec);
+double complex  *HTot_loc   ( Lattice *s, Eigen *d, double *Kvec);
 int CalcBand            (Eigen *d, double complex *H, int bands);
 
 void  PrintEigen        (FILE *fp, double *E, double *k, int N);

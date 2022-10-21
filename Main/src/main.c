@@ -10,8 +10,8 @@
 #include "ham.h"
 #include <complex.h>
 
-#define  KMAX  20
-#define  STEPS 10
+#define  KMAX  40
+//#define  STEPS 20
 
 /**
  * @brief Found the G_vec sets corresponding to specific K_vec within the E_cut ,
@@ -26,15 +26,14 @@
  */
 static inline void KPatch(FILE *band, Lattice *L, double **k, double E_cut, int n_threads )
   {
-    Eigen   **Estack;
-    double complex **Hstack;
+    
+    Eigen* Estack[n_threads];
+    double complex* Hstack[n_threads];
     int n_band = L->a_set->n_atoms*2+8;
     int i,thread;
     int m[n_threads];
 
-    Estack=SafeCalloc(n_threads, sizeof(Eigen*));
-    Hstack=SafeCalloc(n_threads, sizeof(double complex*));
-
+    TimerStart(&L->Form_time);
     #ifdef _OPENMP
     #pragma omp parallel private(thread)
     #endif
@@ -46,42 +45,47 @@ static inline void KPatch(FILE *band, Lattice *L, double **k, double E_cut, int 
         #endif
             Estack[thread]=GVecInit( L,  KMAX,k[thread], E_cut);
     }
-    printf("Finish Building the G_vec mesh\n");
+    printf("Finish Building the G_vec mesh with \n");
     fflush(stdout);
+
 
     for(i=0;i<n_threads;i++)
     {
-        Hstack[i]=HTot(L,Estack[i],k[i]);
-        free(Estack[i]->G_vec);
-        printf("Finish Building the Hamitonian for %d th \n", i+1);
+        Hstack[i]=HTot_loc(L,Estack[i],k[i]);
+        printf("Finish Building the %d th Hamitonian with %d rank\n", i+1, Estack[i]->NG);
         fflush(stdout); 
     }
-    
+    TimerStop(&L->Form_time);
        
     
 
-        #ifdef _OPENMP
-        #pragma omp parallel private(thread)
-        #endif
-        {
-            #ifdef _OPENMP
-            thread = omp_get_thread_num();
-            #else
-            thread = 0;
-            #endif
-            m[thread]=CalcBand( Estack[thread], Hstack[thread], n_band);
-        }
+        // #ifdef _OPENMP
+        // #pragma omp parallel private(thread)
+        // #endif
+        // {
+        //     #ifdef _OPENMP
+        //     thread = omp_get_thread_num();
+        //     #else
+        //     thread = 0;
+        //     #endif
+        //     m[thread]=CalcBand( Estack[thread], Hstack[thread], n_band);
+        // }
         
         //print_rmatrix( "Selected eigenvalues", 1, m, L->E, 1 );
+        TimerStart(&L->Solve_time);
+        for(i=0;i<n_threads;i++)
+        {
+            m[i]=CalcBand( Estack[i], Hstack[i], n_band);
+        }
+        TimerStop(&L->Solve_time);
 
         for(i=0;i<n_threads;i++)
         {
             PrintEigen(band, Estack[i]->E, k[i],m[i]);
-            free(Estack[i]);
-            free(Hstack[i]);
+            BandFinish(Estack[i]);
+
         }
-        free(Estack);
-        free(Hstack);
+
 
   }
 
@@ -114,11 +118,13 @@ int main(int argc, char **argv)
     FILE *band;
     Lattice *L;
 
+    Timer   tot_time;
 
     int     i,j;
     char   *foldername;
     char   *simname = argv[1];
     int    n_threads = atoi(argv[2]);
+    int    STEPS=atoi(argv[3]);
     
     StringClone(foldername,simname);
     StrCat(&foldername, "_band_structure");
@@ -137,7 +143,10 @@ int main(int argc, char **argv)
     fflush(stdout);
     ErrorStreamOpen("error.log");
 
-    if(argc == 3)
+
+
+    TimerStart(&tot_time);
+    if(argc == 4)
     {
         CreateFolder(foldername);
         band = OpenBandFile(foldername);
@@ -145,19 +154,28 @@ int main(int argc, char **argv)
 
 
         L = LatticeInitial(simname);
+
+        L->Form_time.tot_wtime=0;
+        L->Form_time.tot_ctime=0;
+        L->Solve_time.tot_wtime=0;
+        L->Solve_time.tot_ctime=0;
+
         k_path=KBuild(L, STEPS*n_threads);
-        PPtest(L,foldername);
+        //PPtest(L,foldername);
 
         for(i=0;i<STEPS;i++)
         {
             for(j=0;j<n_threads;j++)
             {
-                k[j]= k_path+3*(i*STEPS+j);
+                k[j]= k_path+3*(i*n_threads+j);
             }
             KPatch(band, L,k, E_cut, n_threads );
             printf("The %d patch finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);
             fflush(stdout);
         }
+
+        printf("The time spent to biuld the Hamitonian: %f\n",L->Form_time.tot_wtime);
+        printf("The time spent to solve the eigen problem: %f\n",L->Solve_time.tot_wtime);
     
         fclose(band);
     }
@@ -168,6 +186,11 @@ int main(int argc, char **argv)
         return 1;
     }
     
+    TimerStop(&tot_time);
+    printf("Total time spend for %d atoms, and %d k points:\n",L->a_set->n_atoms,STEPS*n_threads);
+    TimerReport(&tot_time,NULL);
+
+
     ErrorStreamClose();
     printf("Band calculate finished\n");
     fflush(stdout);

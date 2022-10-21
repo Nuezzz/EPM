@@ -9,29 +9,19 @@
 
 
 
-double complex *HTot ( Lattice *s, Eigen *d, double *Kvec)
+double complex *HTot_loc ( Lattice *s, Eigen *d, double *Kvec)
 {
-    int i,j;
+    int i;
     int NG = d->NG;
     double GpK[3];
     double **G_vec = d->G_vec;
-    double complex *H =  SafeCalloc(NG*NG, sizeof( double complex ));
-    double complex *V_loc= HLocal(s, d);
+    double complex *H= HLocal(s, d);
 
     // Declare variables for eigen solver
 
     // double	   w[NG];
     // double complex Z[NG*NG];
 
-
-    // could use memcopy to save time
-    for(i=0; i< NG; i++)
-    {
-        for(j=0; j< NG; j++)
-        {
-            H[i*NG+j] = V_loc[i*NG+j];
-        }
-    }
     #ifdef _OPENMP
     #pragma omp parallel for schedule(static)  private(GpK)
     #endif
@@ -42,6 +32,7 @@ double complex *HTot ( Lattice *s, Eigen *d, double *Kvec)
         GpK[2]= G_vec[i][2]+Kvec[2];
         H[i*NG+i]+= H2M0Q0*Dot(GpK,GpK)*1.0e20;
     }
+
     return H;
     // print_matrix( "Selected eigenvectors (stored columnwise)", NG, NG, H, NG);
     // m = LapackEigenSolve(10, NG, H, w, Z);
@@ -65,6 +56,7 @@ int CalcBand(Eigen *d, double complex *H, int bands)
     //print_matrix( "Selected eigenvectors (stored columnwise)", NG, NG, H, NG);
     m = LapackEigenSolve(bands, d->NG, H, w, Z);
 
+    free(H);
     return m;
 
 }

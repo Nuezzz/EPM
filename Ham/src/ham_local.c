@@ -133,10 +133,12 @@ static inline void PotentialMix(Lattice *s,double q[3], double complex *V_loc, i
     double q_sqr = sqrt(Dot(q,q))*1.0e10*BOHR; // in unit of 1/Bohr
 
     Atom **atoms= s->a_set->atom_array;
+    Atom *atom;
     int n_atom=s->a_set->n_atoms;
     int n_spe =s->n_spe;
     // double pot[n_atom];
     double pot;
+    double V_tmp;
     double Vf[n_spe][n_spe];
 
     for(int i=0; i<n_spe; i++)
@@ -149,17 +151,18 @@ static inline void PotentialMix(Lattice *s,double q[3], double complex *V_loc, i
     for (int i=0; i<n_atom;i++ )
     {
         pot =0;
-        for(int j=0; j < atoms[i]->n_spe ; j++)
+        atom = atoms[i]; 
+        for(int j=0; j < atom->n_spe ; j++)
         {
             //pot[i]+=Vf[atoms[i]->spe][atoms[i]->neighbor_spe[j]]*atoms[i]->n_neighbor[j];
-            pot+=Vf[atoms[i]->spe][atoms[i]->neighbor_spe[j]]*atoms[i]->n_neighbor[j];
+            pot+=Vf[atom->spe][atom->neighbor_spe[j]]*atom->n_neighbor[j];
         }
         //pot[i]/=4;
         pot/=4;
        // V_loc[m*NG+n] += cexp(-I*Dot(q,atoms[i]->tau))*pot[i];
-       V_loc[m*NG+n] += cexp(-I*Dot(q,atoms[i]->tau))*pot;
+       V_tmp += cexp(-I*Dot(q,atoms[i]->tau))*pot;
     }
-
+    V_loc[m*NG+n]=V_tmp;
 }
 
 double complex *HLocal(Lattice *s, Eigen *d)
@@ -174,6 +177,7 @@ double complex *HLocal(Lattice *s, Eigen *d)
     #ifdef _OPENMP
     #pragma omp parallel for schedule(dynamic)  private(j,q)
     #endif
+    
     for(i=0;i<NG;i++)
     {
         for(j=0;j<i;j++)

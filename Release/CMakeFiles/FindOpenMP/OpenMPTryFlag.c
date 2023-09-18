@@ -1,7 +1,7 @@
 
 #include <omp.h>
 int main(void) {
-#ifdef _OPENMP
+#ifdef _
   omp_get_max_threads();
   return 0;
 #elif defined(__HIP_DEVICE_COMPILE__)

@@ -16,6 +16,7 @@
         "stdlib.h": "c",
         "thread": "c",
         "bitset": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "openmp.h": "c"
     }
 }

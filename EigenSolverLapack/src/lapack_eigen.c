@@ -16,6 +16,13 @@
 void print_matrix( char* desc, int m, int n, double complex *a, int lda );
 void print_rmatrix( char* desc, int m, int n, double *a, int lda );
 
+/// @brief Solve the eigen value problem using lapack routine
+/// @param NUM_BANDS 
+/// @param N_RANK 
+/// @param A 
+/// @param w 
+/// @param z 
+/// @return m number of eigen values calculated
 int LapackEigenSolve(int NUM_BANDS, int N_RANK, double complex  *A, double *w, double complex *z)
 {
 

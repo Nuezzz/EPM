@@ -103,9 +103,9 @@ bin/EPM_debug: Reader/libreader.a
 bin/EPM_debug: List/liblist.a
 bin/EPM_debug: EigenSolverLapack/liblapack_solver.a
 bin/EPM_debug: Control/libcontrol.a
-bin/EPM_debug: /usr/lib/x86_64-linux-gnu/libmkl_core.so
-bin/EPM_debug: /usr/lib/x86_64-linux-gnu/libmkl_gnu_thread.so
-bin/EPM_debug: /usr/lib/x86_64-linux-gnu/libmkl_intel_ilp64.so
+bin/EPM_debug: /opt/intel/oneapi/mkl/2023.1.0/lib/intel64/libmkl_core.so
+bin/EPM_debug: /opt/intel/oneapi/mkl/2023.1.0/lib/intel64/libmkl_gnu_thread.so
+bin/EPM_debug: /opt/intel/oneapi/mkl/2023.1.0/lib/intel64/libmkl_intel_ilp64.so
 bin/EPM_debug: CMakeFiles/EPM_debug.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable bin/EPM_debug"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/EPM_debug.dir/link.txt --verbose=$(VERBOSE)

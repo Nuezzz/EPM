@@ -91,9 +91,7 @@ static inline int BuildG(Lattice *s,Eigen *d, double E_cut,  int Kmax)
 		b[i][1]=s->b[i][1];
 		b[i][2]=s->b[i][2];
 	}
-	#ifdef _OPENMP
-    #pragma omp parallel for schedule(static)  private(j,k,G_int,G_tmp,Gk_mod) reduction(+:NG)
-    #endif
+
 	for(i=0; i<2*Kmax+1; i++)
 	{
 		G_int[0]=i-Kmax;
@@ -124,9 +122,7 @@ static inline int BuildG(Lattice *s,Eigen *d, double E_cut,  int Kmax)
 	}
 
 	BandInit(d,NG);
-	#ifdef _OPENMP
-    #pragma omp parallel for schedule(static)
-    #endif
+
 	for ( i = 0; i < NG; i++)
 	{
 		d->G_vec[i][0]=G_bulk[i*3+0];

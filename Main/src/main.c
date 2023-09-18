@@ -24,7 +24,7 @@
  * @param E_cut 
  * @param n_threads 
  */
-static inline void KPatch(FILE *band, Lattice *L, double **k, double E_cut, int n_threads )
+static inline void KPatch_loc(FILE *band, Lattice *L, double **k, double E_cut, int n_threads )
   {
     
     Eigen* Estack[n_threads];
@@ -51,7 +51,7 @@ static inline void KPatch(FILE *band, Lattice *L, double **k, double E_cut, int 
 
     for(i=0;i<n_threads;i++)
     {
-        Hstack[i]=HTot_loc(L,Estack[i],k[i]);
+        Hstack[i]=H_tot_loc(L,Estack[i],k[i]);
         printf("Finish Building the %d th Hamitonian with %d rank\n", i+1, Estack[i]->NG);
         fflush(stdout); 
     }
@@ -75,7 +75,7 @@ static inline void KPatch(FILE *band, Lattice *L, double **k, double E_cut, int 
         TimerStart(&L->Solve_time);
         for(i=0;i<n_threads;i++)
         {
-            m[i]=CalcBand( Estack[i], Hstack[i], n_band);
+            m[i]=CalcBand( Estack[i], Hstack[i], n_band, Estack[i]->NG);
         }
         TimerStop(&L->Solve_time);
 
@@ -88,6 +88,85 @@ static inline void KPatch(FILE *band, Lattice *L, double **k, double E_cut, int 
 
 
   }
+
+/**
+ * @brief Found the G_vec sets corresponding to specific K_vec within the E_cut ,
+ * build the Hamitonian including spin-obital, solve it's eigen value and print out the band
+ * @param band 
+ * @param L 
+ * @param Estack 
+ * @param Hstack 
+ * @param k 
+ * @param E_cut 
+ * @param n_threads 
+ */
+static inline void KPatch_so(FILE *band, Lattice *L, double **k, double E_cut, int n_threads )
+  {
+    
+    Eigen* Estack[n_threads];
+    double complex* Hstack[n_threads];
+    int n_band = L->a_set->n_atoms*2+8;
+    int i,thread;
+    int m[n_threads];
+
+
+    TimerStart(&L->Form_time);
+    #ifdef _OPENMP
+    #pragma omp parallel private(thread)
+    #endif
+    {
+        #ifdef _OPENMP
+            thread = omp_get_thread_num();
+        #else
+            thread = 0;
+        #endif
+            Estack[thread]=GVecInit( L,  KMAX,k[thread], E_cut);
+    }
+    printf("Finish Building the G_vec mesh with \n");
+    fflush(stdout);
+
+
+    for(i=0;i<n_threads;i++)
+    {
+        Hstack[i]=H_tot_so(L,Estack[i],k[i]);
+        printf("Finish Building the %d th Hamitonian with %d rank\n", i+1, 2*Estack[i]->NG);
+        fflush(stdout); 
+    }
+    TimerStop(&L->Form_time);
+       
+    
+
+        // #ifdef _OPENMP
+        // #pragma omp parallel private(thread)
+        // #endif
+        // {
+        //     #ifdef _OPENMP
+        //     thread = omp_get_thread_num();
+        //     #else
+        //     thread = 0;
+        //     #endif
+        //     m[thread]=CalcBand( Estack[thread], Hstack[thread], n_band);
+        // }
+        
+        //print_rmatrix( "Selected eigenvalues", 1, m, L->E, 1 );
+        TimerStart(&L->Solve_time);
+        for(i=0;i<n_threads;i++)
+        {
+            m[i]=CalcBand( Estack[i], Hstack[i], n_band, 2*Estack[i]->NG);
+        }
+        TimerStop(&L->Solve_time);
+
+        for(i=0;i<n_threads;i++)
+        {
+            PrintEigen(band, Estack[i]->E, k[i],m[i]);
+            BandFinish(Estack[i]);
+
+        }
+
+
+  }
+
+
 
 static inline double *KBuild(Lattice *L, int N)
 {
@@ -123,14 +202,15 @@ int main(int argc, char **argv)
     int     i,j;
     char   *foldername;
     char   *simname = argv[1];
-    int    n_threads = atoi(argv[2]);
-    int    STEPS=atoi(argv[3]);
+    char   *simtype = argv[2];
+    int    n_threads = atoi(argv[3]);
+    int    STEPS=atoi(argv[4]);
     
     StringClone(foldername,simname);
     StrCat(&foldername, "_band_structure");
     
 
-    // double complex *H_tot;
+    // double complex *H_tot_loc;
     
     double  E_cut = 80.0;
     double  *k[n_threads];
@@ -169,7 +249,10 @@ int main(int argc, char **argv)
             {
                 k[j]= k_path+3*(i*n_threads+j);
             }
-            KPatch(band, L,k, E_cut, n_threads );
+            if(!strcmp(simtype,"SO"))
+                KPatch_so(band, L,k, E_cut, n_threads );
+            else if(!strcmp(simtype,"LOC"))
+                KPatch_loc(band, L,k, E_cut, n_threads );
             printf("The %d patch finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);
             fflush(stdout);
         }

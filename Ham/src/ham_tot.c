@@ -8,8 +8,12 @@
 #include "constants.h"
 
 
-
-double complex *HTot_loc ( Lattice *s, Eigen *d, double *Kvec)
+/// @brief Constructed the hamitonian matrix for local potential
+/// @param s pointer to the lattice
+/// @param d 
+/// @param Kvec 
+/// @return 
+double complex *H_tot_loc ( Lattice *s, Eigen *d, double *Kvec)
 {
     int i;
     int NG = d->NG;
@@ -22,9 +26,6 @@ double complex *HTot_loc ( Lattice *s, Eigen *d, double *Kvec)
     // double	   w[NG];
     // double complex Z[NG*NG];
 
-    #ifdef _OPENMP
-    #pragma omp parallel for schedule(static)  private(GpK)
-    #endif
     for(i=0; i< NG; i++)
     {
         GpK[0]= G_vec[i][0]+Kvec[0];
@@ -40,6 +41,34 @@ double complex *HTot_loc ( Lattice *s, Eigen *d, double *Kvec)
 
 }
 
+double complex *H_tot_so ( Lattice *s, Eigen *d, double *Kvec)
+{
+    int i;
+    int NG = d->NG;
+    double Ek_tmp;
+    double GpK[3];
+    double **G_vec = d->G_vec;
+    double complex *H= HSO(s, d, Kvec);
+
+    // Declare variables for eigen solver
+
+    // double	   w[NG];
+    // double complex Z[NG*NG];
+
+    for(i=0; i< NG; i++)
+    {
+        GpK[0]= G_vec[i][0]+Kvec[0];
+        GpK[1]= G_vec[i][1]+Kvec[1];
+        GpK[2]= G_vec[i][2]+Kvec[2];
+        Ek_tmp = H2M0Q0*Dot(GpK,GpK)*1.0e20;
+        H[(i*4)*NG+2*i]+= Ek_tmp;
+        H[(i*4+2)*NG+2*i+1]+= Ek_tmp;
+    }
+
+    return H;
+
+}
+
 /**
  * @brief Calculate the eigen energy and eigen vector of vertain k point
  * 
@@ -47,14 +76,14 @@ double complex *HTot_loc ( Lattice *s, Eigen *d, double *Kvec)
  * @param H hamitonial matrix
  * @return number of bands calulated
  */
-int CalcBand(Eigen *d, double complex *H, int bands)
+int CalcBand(Eigen *d, double complex *H, int bands, int N_RANK)
 {
     int     m;
     double	   *w= d->E;
     double complex *Z= d->Phi;
 
     //print_matrix( "Selected eigenvectors (stored columnwise)", NG, NG, H, NG);
-    m = LapackEigenSolve(bands, d->NG, H, w, Z);
+    m = LapackEigenSolve(bands, N_RANK, H, w, Z);
 
     free(H);
     return m;

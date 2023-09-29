@@ -101,7 +101,7 @@ static inline void KPatch_loc(FILE *band, Lattice *L, double **k, double E_cut, 
  * @param n_threads 
  */
 static inline void KPatch_so(FILE *band, Lattice *L, double **k, double E_cut, int n_threads )
-  {
+{
     
     Eigen* Estack[n_threads];
     double complex* Hstack[n_threads];

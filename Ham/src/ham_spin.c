@@ -17,12 +17,12 @@ static inline double *lambda(Lattice *s)
 	for(i=0;i<n_spe;i++)
 	{
     // TODO: Make this a switch-case over an enum?
-    	if(!strcmp(s->mat_name[i],"SI"))  lamb[i]=(0.000106*RYD);
-    	else if(!strcmp(s->mat_name[i],"GE"))  lamb[i]=(0.00058*RYD);
-    	else if(!strcmp(s->mat_name[i],"GA"))	lamb[i]=(0.000402*RYD);
-    	else if(!strcmp(s->mat_name[i],"AS"))	lamb[i]=(0.000402*1.38*RYD);
-    	else if(!strcmp(s->mat_name[i],"CD"))	lamb[i]=(0.055*(0.0250-0.0090)*RYD);
-    	else if(!strcmp(s->mat_name[i],"TE"))	lamb[i]=(0.055*(0.0250+0.0090)*RYD);
+    	if(!strcmp(s->mat_name[i],"Si"))  lamb[i]=(0.000106*RYD);
+    	else if(!strcmp(s->mat_name[i],"Ge"))  lamb[i]=(0.00058*RYD);
+    	else if(!strcmp(s->mat_name[i],"Ga"))	lamb[i]=(0.000402*RYD);
+    	else if(!strcmp(s->mat_name[i],"As"))	lamb[i]=(0.000402*1.38*RYD);
+    	else if(!strcmp(s->mat_name[i],"Cd"))	lamb[i]=(0.055*(0.0250-0.0090)*RYD);
+    	else if(!strcmp(s->mat_name[i],"Te"))	lamb[i]=(0.055*(0.0250+0.0090)*RYD);
     	else if(!strcmp(s->mat_name[i],"CDTEcb"))	lamb[i]=(0.343*(0.002-0.0002)*RYD);
     	else if(!strcmp(s->mat_name[i],"TECDcb"))	lamb[i]=(0.343*(0.002+0.0002)*RYD);
     	else

@@ -41,8 +41,12 @@ static inline void BandInit(Eigen *s, int N)
 	{
 		s->G_vec[i]=s->G_stack+3*i;
 	}
+	//if simulation is for LOC
   	s->E 		=  SafeCalloc(N, sizeof(double));
 	s->Phi 		=  SafeCalloc(N*N, sizeof(double complex));
+	//Else if simulation is for SO double N
+	//s->E 		=  SafeCalloc(2*N, sizeof(double));
+	//s->Phi 		=  SafeCalloc(2*N*2*N, sizeof(double complex));
 }
 
 void BandFinish(Eigen *s)

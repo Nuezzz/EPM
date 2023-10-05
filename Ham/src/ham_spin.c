@@ -75,7 +75,7 @@ double complex *HSO ( Lattice *s, Eigen *d, double *k_vec)
 
 			for(k=0;k<3;k++) q[k]=G_vec[i][k]-G_vec[j][k];
 
-			PotentialMix(s,q,&vloc_tmp,NG);
+			vloc_tmp = PotentialMix(s,q,NG);
 			//Calculate the value of (G+k) X (G'+k)
 			cross[0] = (k_pg[1]*kp_pg[2]-k_pg[2]*kp_pg[1])/(Tpiba_sq);
 			cross[1] = (k_pg[2]*kp_pg[0]-k_pg[0]*kp_pg[2])/(Tpiba_sq);
@@ -85,7 +85,6 @@ double complex *HSO ( Lattice *s, Eigen *d, double *k_vec)
 			{
 				m=atoms[k]->spe;
 				vso_tmp = vso_tmp + v_s[m]*cexp(-I*Dot(q,atoms[i]->tau));
-
 			}
 			vso_tmp = vso_tmp/n_atom;
 

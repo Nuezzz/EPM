@@ -215,7 +215,7 @@ static inline void BuildRe( Lattice *s)
 	b[2][1] = a[0][2]*a[1][0] - a[0][0]*a[1][2];
 	b[2][2] = a[0][0]*a[1][1] - a[0][1]*a[1][0];
 
-	vol	=	abs(a[1][1]*b[1][1]+a[1][2]*b[1][2]+a[1][0]*b[1][0]);
+	vol	=	fabs(a[1][1]*b[1][1]+a[1][2]*b[1][2]+a[1][0]*b[1][0]);
 	s->vol = vol;
 	
 	for (i=0; i<3; i++)
@@ -258,6 +258,7 @@ static inline void ReadPoscar	(Lattice *s, char *title )
 
     
 	printf("Lattice %s is used for band structure calculation\n",s0);
+	fflush(stdout);
 
 	s0 = ReaderGetEntry(fr,1,0);
 	s->A0 = atof(s0);
@@ -265,11 +266,9 @@ static inline void ReadPoscar	(Lattice *s, char *title )
 	ReadLatticeVector(s, fr);
 	ReadMatInfo(s, fr );
 	ReadAtomNum(s, fr);
-
+	
 	s->a_set=AsetInitial( s->n_spe, s->natom_spe);
 	ReadAtomPos(s, fr);
-	
-
 }
 
 

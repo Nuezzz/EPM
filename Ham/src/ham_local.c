@@ -117,7 +117,7 @@ void PPtest(Lattice *s, char *simname)
 /// @param q q_vector in unit of 1/Bohr within first Brillouin zone
 /// @param V_loc the pointer to pass the output value of local potential
 /// @param NG number of G vectors
-void PotentialMix(Lattice *s, double q[3], double complex *V_loc, int NG)
+double complex PotentialMix(Lattice *s, double q[3], int NG)
 // Mysteriously you when you return a double complex type, the value is totally wrong, so I pass the
 // address to the function and do the assignment inside the function
 {
@@ -130,7 +130,7 @@ void PotentialMix(Lattice *s, double q[3], double complex *V_loc, int NG)
     int n_spe = s->n_spe;
     // double pot[n_atom];
     double pot;
-    double V_tmp;
+    double complex V_tmp = 0;
     double Vf[n_spe][n_spe];
 
     for (int i = 0; i < n_spe; i++)
@@ -152,9 +152,9 @@ void PotentialMix(Lattice *s, double q[3], double complex *V_loc, int NG)
         // pot[i]/=4;
         pot /= 4;
         // V_loc[m*NG+n] += cexp(-I*Dot(q,atoms[i]->tau))*pot[i];
-        V_tmp += cexp(-I * Dot(q, atoms[i]->tau)) * pot;
+        V_tmp += cexp(-I * Dot(q, atom->tau)) * pot;
     }
-    *V_loc = V_tmp;
+    return V_tmp;
 }
 
 /// @brief
@@ -170,10 +170,6 @@ double complex *HLocal(Lattice *s, Eigen *d)
     int i, j;
     double q[3] = {0, 0, 0};
 
-#ifdef _OPENMP
-#pragma omp parallel for schedule(dynamic) private(j, q)
-#endif
-
     for (i = 0; i < NG; i++)
     {
         for (j = 0; j < i; j++)
@@ -181,8 +177,7 @@ double complex *HLocal(Lattice *s, Eigen *d)
             q[0] = G_vec[i][0] - G_vec[j][0];
             q[1] = G_vec[i][1] - G_vec[j][1];
             q[2] = G_vec[i][2] - G_vec[j][2];
-            V_tmp= V_loc+i*NG+j ;
-            PotentialMix(s, q, V_tmp, NG);
+            V_loc[i*NG+j]=PotentialMix(s, q, NG);
         }
     }
     return V_loc;

@@ -41,9 +41,14 @@ int LapackEigenSolve(int NUM_BANDS, int N_RANK, double complex  *A, double *w, d
 	lapack_int ifail[ldz];
 	lapack_int info;
 
+	//convert double complex pointer A to lapack_complex_double pointer
+	
+	// lapack_complex_double *A_lapack = (lapack_complex_double *)A;
+	// lapack_complex_double *z_lapack = (lapack_complex_double *)z;
+
 	//print_matrix( "Original matrix is (stored columnwise)", n, n, A, ldz );
-	//info = LAPACKE_zheevx( LAPACK_ROW_MAJOR, 'N', 'I', 'L', n, a, lda, vl, vu,  il, iu, abstol, &m, w, z, ldz, ifail);
-	info = LAPACKE_zheevx(  LAPACK_ROW_MAJOR, 'V',  'I', 'L', n, A, lda, vl, vu, il, iu, abstol, &m, w, z, ldz, ifail );
+	info = LAPACKE_zheevx( LAPACK_ROW_MAJOR, 'N', 'I', 'L', n, A, lda, vl, vu,  il, iu, abstol, &m, w, z, ldz, ifail);
+	//info = LAPACKE_zheevx(  LAPACK_ROW_MAJOR, 'V','I', 'L', n, A_lapack, lda, vl, vu, il, iu, abstol, &m, w, z_lapack, ldz, ifail );
 
 
 	if (info != 0) {

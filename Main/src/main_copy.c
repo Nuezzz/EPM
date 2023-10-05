@@ -70,11 +70,7 @@ static inline void KPatch_so(FILE *band, Lattice *L, double *k, double E_cut)
 
     m =CalcBand( Estack, Hstack, n_band, Estack->NG*2);
 
-    PrintEigen(band, Estack->E, k,m);
     BandFinish(Estack);
-
-
-
   }
 
 
@@ -122,10 +118,11 @@ int main(int argc, char **argv)
 
     int     i;
     char   *foldername;
-    char   *simname = argv[1];
-    char   *simtype = argv[2];
-    int    STEPS=atoi(argv[3]);
+    char   *simname="GaAs" ;
+    char   *simtype="LOC" ;
+    int    STEPS=1;
     int    n_threads = 1;
+
     
     StringClone(foldername,simname);
     StrCat(&foldername, "_band_structure");
@@ -135,9 +132,8 @@ int main(int argc, char **argv)
     
     double  E_cut = 80.0;
     double  *k;
-    double  *k_path;
-
-       
+    double  k_path[3]={0,0,0};
+   
 
 
 	printf("Empirical Sudopotential Calculation\n ");
@@ -147,7 +143,7 @@ int main(int argc, char **argv)
 
 
     TimerStart(&tot_time);
-    if(argc == 4)
+    if(1)
     {
         CreateFolder(foldername);
         band = OpenBandFile(foldername);
@@ -161,13 +157,13 @@ int main(int argc, char **argv)
         L->Solve_time.tot_wtime=0;
         L->Solve_time.tot_ctime=0;
 
-        k_path=KBuild(L, STEPS*n_threads);
+        //test and print out the pseudopotential form factor
         //PPtest(L,foldername);
         if(!strcmp(simtype,"SO"))
         {
             for(i=0;i<STEPS;i++)
             {
-                k= k_path+3*i;
+                k= &k_path[0];
             
                 KPatch_so(band, L,k, E_cut);
                 printf("The %dth K vector finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);
@@ -179,7 +175,7 @@ int main(int argc, char **argv)
         {
             for(i=0;i<STEPS;i++)
             {
-                k= k_path+3*i;
+                k= &k_path[0];
             
                 KPatch_loc(band, L,k, E_cut);
                 printf("The %dth K vector finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);

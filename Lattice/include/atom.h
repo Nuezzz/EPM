@@ -43,6 +43,8 @@ typedef struct atomstack
 
 typedef struct lattice
 {
+    //Type of potential
+    unsigned int pot_type;
     /*Info of atom species*/
 	unsigned int n_spe; // number of atom spycies
     unsigned int *natom_spe;

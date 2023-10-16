@@ -64,25 +64,28 @@ double complex *H_tot_so ( Lattice *s, Eigen *d, double *Kvec)
         H[(i*4)*NG+2*i]+= Ek_tmp;
         H[(i*4+2)*NG+2*i+1]+= Ek_tmp;
     }
-
+    //print_matrix( "Selected eigenvectors (stored columnwise)", 20, 10, H, 2*NG);
     return H;
-
+    
 }
+
 
 /**
  * @brief Calculate the eigen energy and eigen vector of vertain k point
  * 
  * @param d pointer to the structure d that contains G_vector mesh and storage for eigen value, eigen vector
  * @param H hamitonial matrix
+ * @param bands 
+ * @param N_RANK
  * @return number of bands calulated
- */
+*/
 int CalcBand(Eigen *d, double complex *H, int bands, int N_RANK)
 {
-    int     m;
+    int     m=0;
     double	   *w= d->E;
     double complex *Z= d->Phi;
 
-    //print_matrix( "Selected eigenvectors (stored columnwise)", NG, NG, H, NG);
+    //print_matrix( "Selected eigenvectors (stored columnwise)", 20, 10, H, N_RANK);
     m = LapackEigenSolve(bands, N_RANK, H, w, Z);
 
     free(H);
@@ -93,10 +96,10 @@ int CalcBand(Eigen *d, double complex *H, int bands, int N_RANK)
 /**
  * @brief print out the band structure of certain K point
  * 
- * @param E 
- * @param simname 
- * @param k 
- * @param N 
+ * @param fp file name for output
+ * @param E  pointer to the eigen value
+ * @param k  pointer to the k vector
+ * @param N  number of bands been printed out
  */
 void PrintEigen(FILE *fp, double *E, double *k, int N)
 {

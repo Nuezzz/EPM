@@ -28,14 +28,15 @@ static inline void KPatch_loc(FILE *band, Lattice *L, double *k, double E_cut)
 {    
     Eigen* Estack;
     double complex* Hstack;
-    int n_band = L->a_set->n_atoms*4;
-    int m;
+    int n_band = L->a_set->n_atoms*5;
+    int m=0;
 
     //TimerStart(&L->Form_time);
 
     Estack = GVecInit( L,  KMAX,k, E_cut);
-    Hstack =H_tot_loc(L,Estack,k);
+    Hstack = H_tot_loc(L,Estack,k);
 
+    //print_matrix( "Selected eigenvectors (stored columnwise)", 20, 10, Hstack, Estack->NG);
     m=CalcBand( Estack, Hstack, n_band, Estack->NG );
     PrintEigen( band, Estack->E, k,m );
     BandFinish( Estack );
@@ -57,17 +58,17 @@ static inline void KPatch_so(FILE *band, Lattice *L, double *k, double E_cut)
     
     Eigen* Estack;
     double complex* Hstack;
-    int n_band = L->a_set->n_atoms*6;
+    int n_band = L->a_set->n_atoms*4+L->a_set->n_atoms*5;
     int m;
 
     //TimerStart(&L->Form_time);
 
-
+    
 
     Estack = GVecInit( L,  KMAX,k, E_cut);
-    Hstack =H_tot_so(L,Estack,k);
+    Hstack = H_tot_so(L,Estack,k);
 
-
+    //print_matrix( "Selected eigenvectors (stored columnwise)", 20, 10, Hstack, Estack->NG*2);
     m =CalcBand( Estack, Hstack, n_band, Estack->NG*2);
 
     PrintEigen(band, Estack->E, k,m);
@@ -165,6 +166,7 @@ int main(int argc, char **argv)
         //PPtest(L,foldername);
         if(!strcmp(simtype,"SO"))
         {
+            L->pot_type=1;
             for(i=0;i<STEPS;i++)
             {
                 k= k_path+3*i;
@@ -177,6 +179,7 @@ int main(int argc, char **argv)
 
         else if(!strcmp(simtype,"LOC"))
         {
+            L->pot_type=0;
             for(i=0;i<STEPS;i++)
             {
                 k= k_path+3*i;

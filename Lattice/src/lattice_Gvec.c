@@ -33,7 +33,7 @@ void PrintGvec(Eigen *s, char* simname, int N)
  * @param s pointer to lattice 
  * @param N number of valid G vectors for specific k point
  */
-static inline void BandInit(Eigen *s, int N)
+static inline void BandInit(Eigen *s, int N, unsigned int type)
 {
 	s->G_vec 	=  SafeCalloc(N, sizeof(double*));
 	s->G_stack 	=  SafeCalloc(3*N, sizeof(double));
@@ -42,8 +42,18 @@ static inline void BandInit(Eigen *s, int N)
 		s->G_vec[i]=s->G_stack+3*i;
 	}
 	//if simulation is for LOC
-  	s->E 		=  SafeCalloc(N, sizeof(double));
-	s->Phi 		=  SafeCalloc(N*N, sizeof(double complex));
+	if (type == 0)
+	{
+		s->E 		=  SafeCalloc(N, sizeof(double));
+		s->Phi 		=  SafeCalloc(N*N, sizeof(double complex));
+	}
+	//Else if simulation is for SO double N
+	else if (type == 1)
+	{
+		s->E 		=  SafeCalloc(2*N, sizeof(double));
+		s->Phi 		=  SafeCalloc(2*N*2*N, sizeof(double complex));
+	}
+
 	//Else if simulation is for SO double N
 	//s->E 		=  SafeCalloc(2*N, sizeof(double));
 	//s->Phi 		=  SafeCalloc(2*N*2*N, sizeof(double complex));
@@ -71,6 +81,7 @@ static inline int BuildG(Lattice *s,Eigen *d, double E_cut,  int Kmax)
 {
 	int i,j,k;
 
+	unsigned int type = s->pot_type;
 	int NG = 0; //count of number of valid G-vectors 
 	int G_int[3]; 
 	double G_tmp[3]; 
@@ -125,7 +136,7 @@ static inline int BuildG(Lattice *s,Eigen *d, double E_cut,  int Kmax)
 		}
 	}
 
-	BandInit(d,NG);
+	BandInit(d,NG,type);
 
 	for ( i = 0; i < NG; i++)
 	{

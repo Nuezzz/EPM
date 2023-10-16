@@ -117,9 +117,7 @@ void PPtest(Lattice *s, char *simname)
 /// @param q q_vector in unit of 1/Bohr within first Brillouin zone
 /// @param V_loc the pointer to pass the output value of local potential
 /// @param NG number of G vectors
-double complex PotentialMix(Lattice *s, double q[3], int NG)
-// Mysteriously you when you return a double complex type, the value is totally wrong, so I pass the
-// address to the function and do the assignment inside the function
+double complex PotentialMix(Lattice *s, double q[3])
 {
 
     double q_sqr = sqrt(Dot(q, q)) * 1.0e10 * BOHR; // in unit of 1/Bohr
@@ -166,22 +164,24 @@ double complex *HLocal(Lattice *s, Eigen *d)
     int NG = d->NG;
     double **G_vec = d->G_vec;
     double complex *V_loc = SafeCalloc(NG * NG, sizeof(double complex));
-    double complex *V_tmp;
+
     int i, j;
     double q[3] = {0, 0, 0};
 
     for (i = 0; i < NG; i++)
     {
-        for (j = 0; j < i; j++)
+        for (j = 0; j <= i; j++)
         {
             q[0] = G_vec[i][0] - G_vec[j][0];
             q[1] = G_vec[i][1] - G_vec[j][1];
             q[2] = G_vec[i][2] - G_vec[j][2];
-            V_loc[i*NG+j]=PotentialMix(s, q, NG);
+            V_loc[i*NG+j]=PotentialMix(s, q);
         }
     }
     return V_loc;
 }
+
+
 // {
 //     int        n=4;
 //     int        m;

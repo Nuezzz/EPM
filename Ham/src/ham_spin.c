@@ -61,21 +61,17 @@ double complex *HSO ( Lattice *s, Eigen *d, double *k_vec)
 
 	for(i=0;i<NG;i++)
 	{
-		for(j=0;j<NG;j++)
+		for(j=0;j<=i;j++)
 		{
 			vso_tmp = 0;
 			// compute normalized k+G
-			for(k=0;k<3;k++) k_pg[k]=k_vec[k]+G_vec[i][k];
-			k_mod=sqrt(Dot(k_pg,k_pg));
-			for(k=0;k<3;k++) k_pg[k]/=k_mod;
-				// compute normalized k+G'
+			for(k=0;k<3;k++) k_pg[k]= k_vec[k]+G_vec[i][k];
+			// compute normalized k+G'
 			for(k=0;k<3;k++) kp_pg[k]=k_vec[k]+G_vec[j][k];
-			k_mod=sqrt(Dot(kp_pg,kp_pg));
-			for(k=0;k<3;k++) kp_pg[k]/=k_mod;
 
 			for(k=0;k<3;k++) q[k]=G_vec[i][k]-G_vec[j][k];
 
-			vloc_tmp = PotentialMix(s,q,NG);
+			vloc_tmp = PotentialMix(s,q);
 			//Calculate the value of (G+k) X (G'+k)
 			cross[0] = (k_pg[1]*kp_pg[2]-k_pg[2]*kp_pg[1])/(Tpiba_sq);
 			cross[1] = (k_pg[2]*kp_pg[0]-k_pg[0]*kp_pg[2])/(Tpiba_sq);
@@ -84,14 +80,26 @@ double complex *HSO ( Lattice *s, Eigen *d, double *k_vec)
 			for(k=0;k<n_atom;k++)
 			{
 				m=atoms[k]->spe;
-				vso_tmp = vso_tmp + v_s[m]*cexp(-I*Dot(q,atoms[i]->tau));
+				vso_tmp = vso_tmp + v_s[m]*cexp(-I*Dot(q,atoms[k]->tau));
 			}
-			vso_tmp = vso_tmp/n_atom;
+			vso_tmp /= n_atom;
 
-			V_sp[(i*4)*NG+2*j] 	= vloc_tmp+vso_tmp*cexp(-I*cross[2]);         //Block1: s= 1/2,s'= 1/2
-			V_sp[(i*4)*NG+2*j+1 ]		= vso_tmp*cexp(-cross[1]-I*cross[0]);   //Block2: s= 1/2,s'=-1/2
-			V_sp[ (i*4+2)*NG+2*j] 	= vso_tmp*cexp(cross[1]-I*cross[0]);    //Block3: s=-1/2,s'= 1/2
-			V_sp[ (i*4+2)*NG+2*j+1] 	= vloc_tmp+vso_tmp*cexp(I*cross[2]);          //Block4: s=-1/2,s'=-1/2
+			//multiply the spin-orbit coupling potential with the phase factor
+			double complex v_test1 = 0.00001*(-I*cross[2]);
+			double complex v_test2 = 0.00001*(-cross[1]-I*cross[0]);
+			//print out the complex number v_test
+			//printf("%f:  %f + %fi\n",cross[2], creal(v_test), cimag(v_test));
+
+			// V_sp[(i*2)*2*NG+2*j] 	= vloc_tmp+v_test1;
+			// V_sp[ (2*i+1)*2*NG+2*j+1] 	= vloc_tmp+conj(v_test1);
+			// V_sp[(i*2)*2*NG+2*j+1 ]		= v_test2;   //Block2: s= 1/2,s'=-1/2
+			// V_sp[ (2*i+1)*2*NG+2*j] 	= conj(v_test2);    //Block3: s=-1/2,s'= 1/2
+		
+			V_sp[(i*2)*2*NG+2*j] 		= vloc_tmp+vso_tmp*(-I*cross[2]);         //Block1: s= 1/2,s'= 1/2
+			V_sp[(i*2)*2*NG+2*j+1 ]		= vso_tmp*(-cross[1]-I*cross[0]);   //Block2: s= 1/2,s'=-1/2
+			V_sp[ (2*i+1)*2*NG+2*j] 	= vso_tmp*(cross[1]-I*cross[0]);    //Block3: s=-1/2,s'= 1/2
+			V_sp[ (2*i+1)*2*NG+2*j+1] 	= vloc_tmp+vso_tmp*(I*cross[2]);          //Block4: s=-1/2,s'=-1/2
 		}
 	}
+	return V_sp;
 }

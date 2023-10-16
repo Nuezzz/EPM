@@ -17,8 +17,8 @@ void print_matrix( char* desc, int m, int n, double complex *a, int lda );
 void print_rmatrix( char* desc, int m, int n, double *a, int lda );
 
 /// @brief Solve the eigen value problem using lapack routine
-/// @param NUM_BANDS 
-/// @param N_RANK 
+/// @param NUM_BANDS number of results will be calculated
+/// @param N_RANK rank of the matrix
 /// @param A 
 /// @param w 
 /// @param z 
@@ -64,6 +64,7 @@ void print_matrix( char* desc, int m, int n, double complex *a, int lda ) {
         int i, j;
         printf( "\n %s\n", desc );
         for( i = 0; i < m; i++ ) {
+			printf( "%d:	", i );
                 for( j = 0; j < n; j++ )
                         printf( " (%6.2f,%6.2f)", creal(a[i*lda+j]), cimag(a[i*lda+j]) );
                 printf( "\n" );

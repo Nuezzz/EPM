@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "/media/ze/Tool/EPM/Debug/bin/EPM_debug",
-            "args": ["GaAs","SO","100"],
+            "args": ["GaAs","SO","100","1"],
             "stopAtEntry": true,
             "cwd": "/media/ze/Data/EPM_test",
             "environment": [],

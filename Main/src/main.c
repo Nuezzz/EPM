@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 #include "openmp.h"
 #include "atom.h"
 #include "error.h"
@@ -24,12 +27,11 @@
  * @param E_cut 
  * @param n_threads 
  */
-static inline void KPatch_loc(FILE *band, Lattice *L, double *k, double E_cut)
+static inline Eigen* KPatch_loc(FILE *band, Lattice *L, double *k, double E_cut,  int* m)
 {    
     Eigen* Estack;
     double complex* Hstack;
     int n_band = L->a_set->n_atoms*5;
-    int m=0;
 
     //TimerStart(&L->Form_time);
 
@@ -37,9 +39,8 @@ static inline void KPatch_loc(FILE *band, Lattice *L, double *k, double E_cut)
     Hstack = H_tot_loc(L,Estack,k);
 
     //print_matrix( "Selected eigenvectors (stored columnwise)", 20, 10, Hstack, Estack->NG);
-    m=CalcBand( Estack, Hstack, n_band, Estack->NG );
-    PrintEigen( band, Estack->E, k,m );
-    BandFinish( Estack );
+    *m=CalcBand( Estack, Hstack, n_band, Estack->NG );
+    return Estack;
   }
 
 /**
@@ -53,30 +54,23 @@ static inline void KPatch_loc(FILE *band, Lattice *L, double *k, double E_cut)
  * @param E_cut 
  * @param n_threads 
  */
-static inline void KPatch_so(FILE *band, Lattice *L, double *k, double E_cut)
+static inline Eigen* KPatch_so(FILE *band, Lattice *L, double *k, double E_cut,int *m)
 {
-    
     Eigen* Estack;
     double complex* Hstack;
     int n_band = L->a_set->n_atoms*4+L->a_set->n_atoms*5;
-    int m;
 
     //TimerStart(&L->Form_time);
 
     
-
     Estack = GVecInit( L,  KMAX,k, E_cut);
     Hstack = H_tot_so(L,Estack,k);
 
     //print_matrix( "Selected eigenvectors (stored columnwise)", 20, 10, Hstack, Estack->NG*2);
-    m =CalcBand( Estack, Hstack, n_band, Estack->NG*2);
+    *m =CalcBand( Estack, Hstack, n_band, Estack->NG*2);
 
-    PrintEigen(band, Estack->E, k,m);
-    BandFinish(Estack);
-
-
-
-  }
+    return Estack;
+}
 
 
 
@@ -101,7 +95,7 @@ static inline double *KBuild(Lattice *L, int N)
     printf("K vector created: %d\n",N);
     fflush(stdout);
     return k_vector;
-    
+
 }
 
 
@@ -126,11 +120,10 @@ int main(int argc, char **argv)
     char   *simname = argv[1];
     char   *simtype = argv[2];
     int    STEPS=atoi(argv[3]);
-    int    n_threads = 1;
+    int    n_threads = atoi(argv[4]);
     
     StringClone(foldername,simname);
     StrCat(&foldername, "_band_structure");
-    
 
     // double complex *H_tot_loc;
     
@@ -138,22 +131,18 @@ int main(int argc, char **argv)
     double  *k;
     double  *k_path;
 
-       
-
 
 	printf("Empirical Sudopotential Calculation\n ");
     fflush(stdout);
     ErrorStreamOpen("error.log");
 
 
-
     TimerStart(&tot_time);
-    if(argc == 4)
+    if(argc == 5)
     {
         CreateFolder(foldername);
         band = OpenBandFile(foldername);
         OMPSetThreadNum(n_threads);
-
 
         L = LatticeInitial(simname);
 
@@ -162,31 +151,56 @@ int main(int argc, char **argv)
         L->Solve_time.tot_wtime=0;
         L->Solve_time.tot_ctime=0;
 
-        k_path=KBuild(L, STEPS*n_threads);
+        k_path=KBuild(L, STEPS);
         //PPtest(L,foldername);
         if(!strcmp(simtype,"SO"))
         {
             L->pot_type=1;
+            #ifdef _OPENMP
+            #pragma omp parallel for schedule(static) private(i,k)
+            #endif
             for(i=0;i<STEPS;i++)
             {
+                Eigen* Estack;
+                int m=0;
                 k= k_path+3*i;
             
-                KPatch_so(band, L,k, E_cut);
-                printf("The %dth K vector finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);
-                fflush(stdout);
+                Estack = KPatch_so(band, L,k, E_cut,&m);
+
+                #ifdef _OPENMP
+                #pragma omp critical
+                #endif
+                PrintEigen(band, Estack->E, k,m);
+
+                BandFinish(Estack);
+
+                //printf("The %dth K vector finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);
+                //fflush(stdout);
             }
         }
 
         else if(!strcmp(simtype,"LOC"))
         {
             L->pot_type=0;
+            #ifdef _OPENMP
+            #pragma omp parallel for schedule(static) private(i,k)
+            #endif
             for(i=0;i<STEPS;i++)
             {
                 k= k_path+3*i;
+
+                int m=0;
+                Eigen* Estack;
+                Estack = KPatch_loc(band, L,k, E_cut,&m);
             
-                KPatch_loc(band, L,k, E_cut);
-                printf("The %dth K vector finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);
-                fflush(stdout);
+                #ifdef _OPENMP
+                #pragma omp critical
+                #endif
+                PrintEigen(band, Estack->E, k,m);
+
+                BandFinish(Estack);
+                //printf("The %dth K vector finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);
+                //fflush(stdout);
             }
         }
 

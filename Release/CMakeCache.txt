@@ -229,16 +229,16 @@ EXECUTABLE_OUTPUT_PATH:PATH=
 LIBRARY_OUTPUT_PATH:PATH=
 
 //Path to a file.
-L_INCLUDE:PATH=/opt/intel/oneapi/mkl/2022.1.0/include
+L_INCLUDE:PATH=/opt/intel/oneapi/mkl/2023.1.0/include
 
 //Path to a library.
-MKL_CORE_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libmkl_core.so
+MKL_CORE_LIB:FILEPATH=/opt/intel/oneapi/mkl/2023.1.0/lib/intel64/libmkl_core.so
 
 //Path to a library.
-MKL_GNU_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libmkl_gnu_thread.so
+MKL_GNU_LIB:FILEPATH=/opt/intel/oneapi/mkl/2023.1.0/lib/intel64/libmkl_gnu_thread.so
 
 //Path to a library.
-MKL_ILP64_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libmkl_intel_ilp64.so
+MKL_ILP64_LIB:FILEPATH=/opt/intel/oneapi/mkl/2023.1.0/lib/intel64/libmkl_intel_ilp64.so
 
 //CXX compiler flags for OpenMP parallelization
 OpenMP_CXX_FLAGS:STRING=-fopenmp
@@ -265,7 +265,7 @@ control_LIB_DEPENDS:STATIC=general;m;
 ham_LIB_DEPENDS:STATIC=general;lattice;general;control;general;lapack_solver;
 
 //Dependencies for the target
-lapack_solver_LIB_DEPENDS:STATIC=general;control;general;/usr/lib/x86_64-linux-gnu/libmkl_core.so;general;/usr/lib/x86_64-linux-gnu/libmkl_gnu_thread.so;general;/usr/lib/x86_64-linux-gnu/libmkl_intel_ilp64.so;
+lapack_solver_LIB_DEPENDS:STATIC=general;control;general;/opt/intel/oneapi/mkl/2023.1.0/lib/intel64/libmkl_core.so;general;/opt/intel/oneapi/mkl/2023.1.0/lib/intel64/libmkl_gnu_thread.so;general;/opt/intel/oneapi/mkl/2023.1.0/lib/intel64/libmkl_intel_ilp64.so;
 
 //Dependencies for the target
 lattice_LIB_DEPENDS:STATIC=general;reader;general;control;

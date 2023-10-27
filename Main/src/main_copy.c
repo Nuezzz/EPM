@@ -24,56 +24,70 @@
  * @param E_cut 
  * @param n_threads 
  */
-static inline void KPatch_loc(FILE *band, Lattice *L, double *k, double E_cut)
-{    
-    Eigen* Estack;
-    double complex* Hstack;
-    int n_band = L->a_set->n_atoms*4;
-    int m;
-
-    //TimerStart(&L->Form_time);
-
-    Estack = GVecInit( L,  KMAX,k, E_cut);
-    Hstack =H_tot_loc(L,Estack,k);
-
-    m=CalcBand( Estack, Hstack, n_band, Estack->NG );
-    PrintEigen( band, Estack->E, k,m );
-    BandFinish( Estack );
-  }
-
-/**
- * @brief Found the G_vec sets corresponding to specific K_vec within the E_cut ,
- * build the Hamitonian including spin-obital, solve it's eigen value and print out the band
- * @param band 
- * @param L 
- * @param Estack 
- * @param Hstack 
- * @param k 
- * @param E_cut 
- * @param n_threads 
- */
-static inline void KPatch_so(FILE *band, Lattice *L, double *k, double E_cut)
-{
+static inline void KPatch(FILE *band, Lattice *L, double **k, double E_cut, int n_threads )
+  {
     
-    Eigen* Estack;
-    double complex* Hstack;
-    int n_band = L->a_set->n_atoms*6;
-    int m;
+    Eigen* Estack[n_threads];
+    double complex* Hstack[n_threads];
+    int n_band = L->a_set->n_atoms*2+8;
+    int i,thread;
+    int m[n_threads];
 
-    //TimerStart(&L->Form_time);
+    TimerStart(&L->Form_time);
+    #ifdef _OPENMP
+    #pragma omp parallel private(thread)
+    #endif
+    {
+        #ifdef _OPENMP
+            thread = omp_get_thread_num();
+        #else
+            thread = 0;
+        #endif
+            Estack[thread]=GVecInit( L,  KMAX,k[thread], E_cut);
+    }
+    printf("Finish Building the G_vec mesh with \n");
+    fflush(stdout);
 
 
+    for(i=0;i<n_threads;i++)
+    {
+        Hstack[i]=HTot_loc(L,Estack[i],k[i]);
+        printf("Finish Building the %d th Hamitonian with %d rank\n", i+1, Estack[i]->NG);
+        fflush(stdout); 
+    }
+    TimerStop(&L->Form_time);
+       
+    
 
-    Estack = GVecInit( L,  KMAX,k, E_cut);
-    Hstack =H_tot_so(L,Estack,k);
+        // #ifdef _OPENMP
+        // #pragma omp parallel private(thread)
+        // #endif
+        // {
+        //     #ifdef _OPENMP
+        //     thread = omp_get_thread_num();
+        //     #else
+        //     thread = 0;
+        //     #endif
+        //     m[thread]=CalcBand( Estack[thread], Hstack[thread], n_band);
+        // }
+        
+        //print_rmatrix( "Selected eigenvalues", 1, m, L->E, 1 );
+        TimerStart(&L->Solve_time);
+        for(i=0;i<n_threads;i++)
+        {
+            m[i]=CalcBand( Estack[i], Hstack[i], n_band);
+        }
+        TimerStop(&L->Solve_time);
+
+        for(i=0;i<n_threads;i++)
+        {
+            PrintEigen(band, Estack[i]->E, k[i],m[i]);
+            BandFinish(Estack[i]);
+
+        }
 
 
-    m =CalcBand( Estack, Hstack, n_band, Estack->NG*2);
-
-    BandFinish(Estack);
   }
-
-
 
 static inline double *KBuild(Lattice *L, int N)
 {
@@ -92,9 +106,6 @@ static inline double *KBuild(Lattice *L, int N)
         k_vector[i*3+1]= k_0[1] + i*dk[1];
         k_vector[i*3+2]= k_0[2] + i*dk[2];
     }
-    //print out the how many K vector is created
-    printf("K vector created: %d\n",N);
-    fflush(stdout);
     return k_vector;
     
 }
@@ -102,13 +113,6 @@ static inline double *KBuild(Lattice *L, int N)
 
 //create G_vec array for each K_vec in the first patch, each patch should 
 //contain n_treads of K_vec
-//write a main function with three arguments, simname, simtype, STEPS
-//simtype can be SO or LOC
-//STEPS is the number of K_vec in the first patch
-//the program will create a folder named simname_band_structure
-//and write the band structure in i
-
-
 int main(int argc, char **argv)
 {
     FILE *band;
@@ -116,24 +120,23 @@ int main(int argc, char **argv)
 
     Timer   tot_time;
 
-    int     i;
+    int     i,j;
     char   *foldername;
-    char   *simname="GaAs" ;
-    char   *simtype="LOC" ;
-    int    STEPS=1;
-    int    n_threads = 1;
-
+    char   *simname = argv[1];
+    int    n_threads = atoi(argv[2]);
+    int    STEPS=atoi(argv[3]);
     
     StringClone(foldername,simname);
     StrCat(&foldername, "_band_structure");
     
 
-    // double complex *H_tot_loc;
+    // double complex *H_tot;
     
     double  E_cut = 80.0;
-    double  *k;
-    double  k_path[3]={0,0,0};
-   
+    double  *k[n_threads];
+    double  *k_path;
+
+       
 
 
 	printf("Empirical Sudopotential Calculation\n ");
@@ -143,7 +146,7 @@ int main(int argc, char **argv)
 
 
     TimerStart(&tot_time);
-    if(1)
+    if(argc == 4)
     {
         CreateFolder(foldername);
         band = OpenBandFile(foldername);
@@ -157,32 +160,23 @@ int main(int argc, char **argv)
         L->Solve_time.tot_wtime=0;
         L->Solve_time.tot_ctime=0;
 
-        //test and print out the pseudopotential form factor
+        k_path=KBuild(L, STEPS*n_threads);
         //PPtest(L,foldername);
-        if(!strcmp(simtype,"SO"))
+
+        for(i=0;i<STEPS;i++)
         {
-            for(i=0;i<STEPS;i++)
+            for(j=0;j<n_threads;j++)
             {
-                k= &k_path[0];
-            
-                KPatch_so(band, L,k, E_cut);
-                printf("The %dth K vector finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);
-                fflush(stdout);
+                k[j]= k_path+3*(i*n_threads+j);
             }
+            KPatch(band, L,k, E_cut, n_threads );
+            printf("The %d patch finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);
+            fflush(stdout);
         }
 
-        else if(!strcmp(simtype,"LOC"))
-        {
-            for(i=0;i<STEPS;i++)
-            {
-                k= &k_path[0];
-            
-                KPatch_loc(band, L,k, E_cut);
-                printf("The %dth K vector finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);
-                fflush(stdout);
-            }
-        }
-
+        printf("The time spent to biuld the Hamitonian: %f\n",L->Form_time.tot_wtime);
+        printf("The time spent to solve the eigen problem: %f\n",L->Solve_time.tot_wtime);
+    
         fclose(band);
     }
 
@@ -192,6 +186,11 @@ int main(int argc, char **argv)
         return 1;
     }
     
+    TimerStop(&tot_time);
+    printf("Total time spend for %d atoms, and %d k points:\n",L->a_set->n_atoms,STEPS*n_threads);
+    TimerReport(&tot_time,NULL);
+
+
     ErrorStreamClose();
     printf("Band calculate finished\n");
     fflush(stdout);

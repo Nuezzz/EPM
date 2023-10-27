@@ -212,7 +212,11 @@ int main(int argc, char **argv)
         printf("No tittle was selected\n");
         return 1;
     }
-    
+
+    TimerStop(&tot_time);
+    printf("Total time spend for %d atoms, and %d k points:\n",L->a_set->n_atoms,STEPS*n_threads);
+    TimerReport(&tot_time,NULL);
+
     ErrorStreamClose();
     printf("Band calculate finished\n");
     fflush(stdout);

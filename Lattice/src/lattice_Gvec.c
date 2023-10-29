@@ -74,10 +74,9 @@ void BandFinish(Eigen *s)
  * 
  * @param s lattice pointer
  * @param E_cut cut off energy (eV)
- * @param Kmax  maximun of G vector index
  * @param k_vec pointer of k_vector use as the center of G vector
  */
-static inline int BuildG(Lattice *s,Eigen *d, double E_cut,  int Kmax)
+static inline int BuildG(Lattice *s,Eigen *d, double E_cut)
 {
 	int i,j,k;
 
@@ -89,7 +88,7 @@ static inline int BuildG(Lattice *s,Eigen *d, double E_cut,  int Kmax)
 	double Gk_mod; // square of length of current G+k vector 
 	double G_max; // square of max length of G vector
 	double b[3][3];//reciprocal lattice vector bases
-	double *G_bulk   =  SafeCalloc(3*Kmax*Kmax*Kmax, sizeof(double) );
+	
 	
 	/*---------------------------------*/
 	// FILE *fp;
@@ -100,6 +99,8 @@ static inline int BuildG(Lattice *s,Eigen *d, double E_cut,  int Kmax)
 	 /******************************/
 
 	G_max = E_cut * IH2M0Q0* 1.0e-20 ;//CONVERT A^-2 to m^-2
+
+	
 	for(i=0; i<3; i++)
 	{
 		b[i][0]=s->b[i][0];
@@ -107,15 +108,25 @@ static inline int BuildG(Lattice *s,Eigen *d, double E_cut,  int Kmax)
 		b[i][2]=s->b[i][2];
 	}
 
-	for(i=0; i<2*Kmax+1; i++)
+	double b1 = sqrt(b[0][0]*b[0][0]+b[0][1]*b[0][1]+b[0][2]*b[0][2]);
+	double b2 = sqrt(b[1][0]*b[1][0]+b[1][1]*b[1][1]+b[1][2]*b[1][2]);
+	double b3 = sqrt(b[2][0]*b[2][0]+b[2][1]*b[2][1]+b[2][2]*b[2][2]);
+
+	int Kmax_1 = (int)ceil(G_max/b1)+1;
+	int Kmax_2 = (int)ceil(G_max/b2)+1;
+	int Kmax_3 = (int)ceil(G_max/b3)+1;
+
+	double *G_bulk   =  SafeCalloc(3*Kmax_1*Kmax_2*Kmax_3, sizeof(double) );
+
+	for(i=0; i<2*Kmax_1+1; i++)
 	{
-		G_int[0]=i-Kmax;
-		for(j=0; j<2*Kmax+1; j++)
+		G_int[0]=i-Kmax_1;
+		for(j=0; j<2*Kmax_2+1; j++)
 		{
-			G_int[1]=j-Kmax;
-			for(k=0; k<2*Kmax+1; k++)
+			G_int[1]=j-Kmax_2;
+			for(k=0; k<2*Kmax_3+1; k++)
 			{
-				G_int[2]=k-Kmax;
+				G_int[2]=k-Kmax_3;
 				G_tmp[0] = G_int[0]*b[0][0]+G_int[1]*b[1][0]+G_int[2]*b[2][0];
 				G_tmp[1] = G_int[0]*b[0][1]+G_int[1]*b[1][1]+G_int[2]*b[2][1];
 				G_tmp[2] = G_int[0]*b[0][2]+G_int[1]*b[1][2]+G_int[2]*b[2][2];
@@ -156,18 +167,17 @@ static inline int BuildG(Lattice *s,Eigen *d, double E_cut,  int Kmax)
  * the eigen energy and eigen fucntion storage
  * 
  * @param L lattice pointer that has already been fulfilled
- * @param K_max maximun number of k vector nodes in one direction, typically larger than  11
  * @param NG pointer to output the number of G_Vec within the cut off
  * @param k_vec pointer to pass the central k_vec
  * @param E_cut cut off energy
  * @return Eigen* 
  */
-Eigen *GVecInit( Lattice *L, int K_max,double *k_vec, double E_cut)
+Eigen *GVecInit( Lattice *L, double *k_vec, double E_cut)
 {
 	Eigen *s=SafeCalloc(1, sizeof(Eigen));
-	int N = 2*K_max*((int)pow(L->a_set->n_atoms,1.0/3.0)+1)+1;
+
 	s->k_vec[0]=k_vec[0]; s->k_vec[1]=k_vec[1]; s->k_vec[2]=k_vec[2];
-	s->NG= BuildG(L,s,E_cut,N);
+	s->NG= BuildG(L,s,E_cut);
 
 	if(s->NG ==  0)
 	{

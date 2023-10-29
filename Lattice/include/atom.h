@@ -85,6 +85,6 @@ typedef struct eigen
 Lattice *LatticeInitial ( char *title );
 void    FindNeighbor    (double A_dis, Lattice *l);
 void    PrintGvec       (Eigen *s, char* filename, int N);
-Eigen  *GVecInit        ( Lattice *L, int K_max, double *k_vec, double E_cut);
+Eigen  *GVecInit        ( Lattice *L, double *k_vec, double E_cut);
 void    BandFinish      (Eigen *s);
 #endif 

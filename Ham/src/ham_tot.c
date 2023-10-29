@@ -116,11 +116,46 @@ void PrintEigen(FILE *fp, double *E, double *k, int N)
     fprintf(fp,"\n");
 }
 
+/**
+ * @brief print out the Number of Gvectors for K point
+ * 
+ * @param fp file name for output
+ * @param NG  Number of G vectors
+ * @param k  pointer to the k vector
+ * @param N  number of bands been printed out
+ */
+void PrintNG(FILE *fp, int *NG, double *k_path, int N)
+{
+
+    int i;
+    double mode;
+    double *k;
+
+    for(i=0;i<N;i++)
+    {
+        k= k_path+3*i;
+        mode=sqrt(Dot(k,k));
+        fprintf(fp, "%.15e %.15e %.15e %.15e", k[0],k[1],k[2],mode);
+        fprintf(fp," %d",NG[i]);
+        fprintf(fp,"\n");
+    }
+    
+}
+
 FILE *OpenBandFile( char* simname)
 {
     FILE *fp;
 	char filename[128];
-	sprintf(filename,"%s/Band_Stracture.dat",simname);
+	sprintf(filename,"%s/Band_Stracture.csv",simname);
+    fp = SafeFOpen(filename, "w");
+    return fp;
+}
+
+FILE *OpenNGFile( char* simname)
+{
+    FILE *fp;
+	char filename[128];
+	sprintf(filename,"%s/NG.csv",simname);
     fp = SafeFOpen(filename, "w");
     return fp;
 }

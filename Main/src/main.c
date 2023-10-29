@@ -18,16 +18,13 @@
 
 /**
  * @brief Found the G_vec sets corresponding to specific K_vec within the E_cut ,
- * build the Hamitonian, solve it's eigen value and print out the band
- * @param band 
- * @param L 
- * @param Estack 
- * @param Hstack 
+ * build the Hamitonian, solve it's eigen value and print out the Band_FIle
+ * @param L  
  * @param k 
  * @param E_cut 
- * @param n_threads 
+ * @param m 
  */
-static inline Eigen* KPatch_loc(FILE *band, Lattice *L, double *k, double E_cut,  int* m)
+static inline Eigen* KPatch_loc( Lattice *L, double *k, double E_cut,  int* m)
 {    
     Eigen* Estack;
     double complex* Hstack;
@@ -35,7 +32,7 @@ static inline Eigen* KPatch_loc(FILE *band, Lattice *L, double *k, double E_cut,
 
     //TimerStart(&L->Form_time);
 
-    Estack = GVecInit( L,  KMAX,k, E_cut);
+    Estack = GVecInit( L,  k, E_cut);
     Hstack = H_tot_loc(L,Estack,k);
 
     //print_matrix( "Selected eigenvectors (stored columnwise)", 20, 10, Hstack, Estack->NG);
@@ -45,16 +42,13 @@ static inline Eigen* KPatch_loc(FILE *band, Lattice *L, double *k, double E_cut,
 
 /**
  * @brief Found the G_vec sets corresponding to specific K_vec within the E_cut ,
- * build the Hamitonian including spin-obital, solve it's eigen value and print out the band
- * @param band 
- * @param L 
- * @param Estack 
- * @param Hstack 
+ * build the Hamitonian including spin-obital, solve it's eigen value and print out the band 
+ * @param L  
  * @param k 
  * @param E_cut 
- * @param n_threads 
+ * @param m 
  */
-static inline Eigen* KPatch_so(FILE *band, Lattice *L, double *k, double E_cut,int *m)
+static inline Eigen* KPatch_so(Lattice *L, double *k, double E_cut,int *m)
 {
     Eigen* Estack;
     double complex* Hstack;
@@ -63,7 +57,7 @@ static inline Eigen* KPatch_so(FILE *band, Lattice *L, double *k, double E_cut,i
     //TimerStart(&L->Form_time);
 
     
-    Estack = GVecInit( L,  KMAX,k, E_cut);
+    Estack = GVecInit( L,  k, E_cut);
     Hstack = H_tot_so(L,Estack,k);
 
     //print_matrix( "Selected eigenvectors (stored columnwise)", 20, 10, Hstack, Estack->NG*2);
@@ -110,7 +104,7 @@ static inline double *KBuild(Lattice *L, int N)
 
 int main(int argc, char **argv)
 {
-    FILE *band;
+    FILE *Band_File, *NG_File;
     Lattice *L;
 
     Timer   tot_time;
@@ -127,11 +121,14 @@ int main(int argc, char **argv)
 
     // double complex *H_tot_loc;
     
-    double  E_cut = 80.0;
+    double  E_cut = 100.0;
     double  *k;
     double  *k_path;
 
+    //***********test line*************************
+    int N_G[STEPS];
 
+    //**********************************************
 	printf("Empirical Sudopotential Calculation\n ");
     fflush(stdout);
     ErrorStreamOpen("error.log");
@@ -141,7 +138,8 @@ int main(int argc, char **argv)
     if(argc == 5)
     {
         CreateFolder(foldername);
-        band = OpenBandFile(foldername);
+        Band_File = OpenBandFile(foldername);
+        NG_File   = OpenNGFile(foldername);
         OMPSetThreadNum(n_threads);
 
         L = LatticeInitial(simname);
@@ -165,18 +163,20 @@ int main(int argc, char **argv)
                 int m=0;
                 k= k_path+3*i;
             
-                Estack = KPatch_so(band, L,k, E_cut,&m);
+                Estack = KPatch_so( L,k, E_cut,&m);
 
                 #ifdef _OPENMP
                 #pragma omp critical
                 #endif
-                PrintEigen(band, Estack->E, k,m);
+                PrintEigen(Band_File, Estack->E, k,m);
 
+                N_G[i]=Estack->NG;                     
                 BandFinish(Estack);
 
                 //printf("The %dth K vector finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);
                 //fflush(stdout);
             }
+            PrintNG(NG_File, N_G, k_path, STEPS);
         }
 
         else if(!strcmp(simtype,"LOC"))
@@ -191,12 +191,12 @@ int main(int argc, char **argv)
 
                 int m=0;
                 Eigen* Estack;
-                Estack = KPatch_loc(band, L,k, E_cut,&m);
+                Estack = KPatch_loc( L,k, E_cut,&m);
             
                 #ifdef _OPENMP
                 #pragma omp critical
                 #endif
-                PrintEigen(band, Estack->E, k,m);
+                PrintEigen(Band_File, Estack->E, k,m);
 
                 BandFinish(Estack);
                 //printf("The %dth K vector finished, %f %% \n ",i+1, (float)(i+1)/(float)(STEPS)*100);
@@ -204,7 +204,8 @@ int main(int argc, char **argv)
             }
         }
 
-        fclose(band);
+        fclose(Band_File);
+        fclose(NG_File);
     }
 
     else
@@ -214,7 +215,7 @@ int main(int argc, char **argv)
     }
 
     TimerStop(&tot_time);
-    printf("Total time spend for %d atoms, and %d k points:\n",L->a_set->n_atoms,STEPS*n_threads);
+    printf("Total time spend for %d atoms, and %d k points:\n",L->a_set->n_atoms,STEPS);
     TimerReport(&tot_time,NULL);
 
     ErrorStreamClose();

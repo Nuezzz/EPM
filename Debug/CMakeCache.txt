@@ -262,6 +262,9 @@ OpenMP_pthread_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libpthread.a
 control_LIB_DEPENDS:STATIC=general;m;
 
 //Dependencies for the target
+epm_LIB_DEPENDS:STATIC=general;control;general;reader;general;lattice;general;ham;
+
+//Dependencies for the target
 ham_LIB_DEPENDS:STATIC=general;lattice;general;control;general;lapack_solver;
 
 //Dependencies for the target
@@ -381,7 +384,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=8
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=9
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

@@ -73,6 +73,7 @@ all: List/all
 all: Reader/all
 all: Lattice/all
 all: Ham/all
+all: Band/all
 all: Main/all
 .PHONY : all
 
@@ -83,6 +84,7 @@ preinstall: List/preinstall
 preinstall: Reader/preinstall
 preinstall: Lattice/preinstall
 preinstall: Ham/preinstall
+preinstall: Band/preinstall
 preinstall: Main/preinstall
 .PHONY : preinstall
 
@@ -94,8 +96,24 @@ clean: List/clean
 clean: Reader/clean
 clean: Lattice/clean
 clean: Ham/clean
+clean: Band/clean
 clean: Main/clean
 .PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory Band
+
+# Recursive "all" directory target.
+Band/all: Band/CMakeFiles/epm.dir/all
+.PHONY : Band/all
+
+# Recursive "preinstall" directory target.
+Band/preinstall:
+.PHONY : Band/preinstall
+
+# Recursive "clean" directory target.
+Band/clean: Band/CMakeFiles/epm.dir/clean
+.PHONY : Band/clean
 
 #=============================================================================
 # Directory level rules for directory Control
@@ -212,6 +230,7 @@ CMakeFiles/EPM_debug.dir/all: List/CMakeFiles/list.dir/all
 CMakeFiles/EPM_debug.dir/all: Reader/CMakeFiles/reader.dir/all
 CMakeFiles/EPM_debug.dir/all: Lattice/CMakeFiles/lattice.dir/all
 CMakeFiles/EPM_debug.dir/all: Ham/CMakeFiles/ham.dir/all
+CMakeFiles/EPM_debug.dir/all: Band/CMakeFiles/epm.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/EPM_debug.dir/build.make CMakeFiles/EPM_debug.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/EPM_debug.dir/build.make CMakeFiles/EPM_debug.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=1,2 "Built target EPM_debug"
@@ -219,7 +238,7 @@ CMakeFiles/EPM_debug.dir/all: Ham/CMakeFiles/ham.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/EPM_debug.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /media/ze/Tool/EPM/Debug/CMakeFiles 24
+	$(CMAKE_COMMAND) -E cmake_progress_start /media/ze/Tool/EPM/Debug/CMakeFiles 27
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/EPM_debug.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /media/ze/Tool/EPM/Debug/CMakeFiles 0
 .PHONY : CMakeFiles/EPM_debug.dir/rule
@@ -240,7 +259,7 @@ CMakeFiles/EPM_debug.dir/clean:
 EigenSolverLapack/CMakeFiles/lapack_solver.dir/all: Control/CMakeFiles/control.dir/all
 	$(MAKE) $(MAKESILENT) -f EigenSolverLapack/CMakeFiles/lapack_solver.dir/build.make EigenSolverLapack/CMakeFiles/lapack_solver.dir/depend
 	$(MAKE) $(MAKESILENT) -f EigenSolverLapack/CMakeFiles/lapack_solver.dir/build.make EigenSolverLapack/CMakeFiles/lapack_solver.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=14,15 "Built target lapack_solver"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=17,18 "Built target lapack_solver"
 .PHONY : EigenSolverLapack/CMakeFiles/lapack_solver.dir/all
 
 # Build rule for subdir invocation for target.
@@ -292,7 +311,7 @@ Control/CMakeFiles/control.dir/clean:
 List/CMakeFiles/list.dir/all: Control/CMakeFiles/control.dir/all
 	$(MAKE) $(MAKESILENT) -f List/CMakeFiles/list.dir/build.make List/CMakeFiles/list.dir/depend
 	$(MAKE) $(MAKESILENT) -f List/CMakeFiles/list.dir/build.make List/CMakeFiles/list.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=20,21 "Built target list"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=23,24 "Built target list"
 .PHONY : List/CMakeFiles/list.dir/all
 
 # Build rule for subdir invocation for target.
@@ -319,7 +338,7 @@ Reader/CMakeFiles/reader.dir/all: Control/CMakeFiles/control.dir/all
 Reader/CMakeFiles/reader.dir/all: List/CMakeFiles/list.dir/all
 	$(MAKE) $(MAKESILENT) -f Reader/CMakeFiles/reader.dir/build.make Reader/CMakeFiles/reader.dir/depend
 	$(MAKE) $(MAKESILENT) -f Reader/CMakeFiles/reader.dir/build.make Reader/CMakeFiles/reader.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=22,23,24 "Built target reader"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=25,26,27 "Built target reader"
 .PHONY : Reader/CMakeFiles/reader.dir/all
 
 # Build rule for subdir invocation for target.
@@ -347,7 +366,7 @@ Lattice/CMakeFiles/lattice.dir/all: List/CMakeFiles/list.dir/all
 Lattice/CMakeFiles/lattice.dir/all: Reader/CMakeFiles/reader.dir/all
 	$(MAKE) $(MAKESILENT) -f Lattice/CMakeFiles/lattice.dir/build.make Lattice/CMakeFiles/lattice.dir/depend
 	$(MAKE) $(MAKESILENT) -f Lattice/CMakeFiles/lattice.dir/build.make Lattice/CMakeFiles/lattice.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=16,17,18,19 "Built target lattice"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=19,20,21,22 "Built target lattice"
 .PHONY : Lattice/CMakeFiles/lattice.dir/all
 
 # Build rule for subdir invocation for target.
@@ -377,7 +396,7 @@ Ham/CMakeFiles/ham.dir/all: Reader/CMakeFiles/reader.dir/all
 Ham/CMakeFiles/ham.dir/all: Lattice/CMakeFiles/lattice.dir/all
 	$(MAKE) $(MAKESILENT) -f Ham/CMakeFiles/ham.dir/build.make Ham/CMakeFiles/ham.dir/depend
 	$(MAKE) $(MAKESILENT) -f Ham/CMakeFiles/ham.dir/build.make Ham/CMakeFiles/ham.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=10,11,12,13 "Built target ham"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=13,14,15,16 "Built target ham"
 .PHONY : Ham/CMakeFiles/ham.dir/all
 
 # Build rule for subdir invocation for target.
@@ -395,6 +414,37 @@ ham: Ham/CMakeFiles/ham.dir/rule
 Ham/CMakeFiles/ham.dir/clean:
 	$(MAKE) $(MAKESILENT) -f Ham/CMakeFiles/ham.dir/build.make Ham/CMakeFiles/ham.dir/clean
 .PHONY : Ham/CMakeFiles/ham.dir/clean
+
+#=============================================================================
+# Target rules for target Band/CMakeFiles/epm.dir
+
+# All Build rule for target.
+Band/CMakeFiles/epm.dir/all: EigenSolverLapack/CMakeFiles/lapack_solver.dir/all
+Band/CMakeFiles/epm.dir/all: Control/CMakeFiles/control.dir/all
+Band/CMakeFiles/epm.dir/all: List/CMakeFiles/list.dir/all
+Band/CMakeFiles/epm.dir/all: Reader/CMakeFiles/reader.dir/all
+Band/CMakeFiles/epm.dir/all: Lattice/CMakeFiles/lattice.dir/all
+Band/CMakeFiles/epm.dir/all: Ham/CMakeFiles/ham.dir/all
+	$(MAKE) $(MAKESILENT) -f Band/CMakeFiles/epm.dir/build.make Band/CMakeFiles/epm.dir/depend
+	$(MAKE) $(MAKESILENT) -f Band/CMakeFiles/epm.dir/build.make Band/CMakeFiles/epm.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/media/ze/Tool/EPM/Debug/CMakeFiles --progress-num=10,11,12 "Built target epm"
+.PHONY : Band/CMakeFiles/epm.dir/all
+
+# Build rule for subdir invocation for target.
+Band/CMakeFiles/epm.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /media/ze/Tool/EPM/Debug/CMakeFiles 25
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Band/CMakeFiles/epm.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /media/ze/Tool/EPM/Debug/CMakeFiles 0
+.PHONY : Band/CMakeFiles/epm.dir/rule
+
+# Convenience name for target.
+epm: Band/CMakeFiles/epm.dir/rule
+.PHONY : epm
+
+# clean rule for target.
+Band/CMakeFiles/epm.dir/clean:
+	$(MAKE) $(MAKESILENT) -f Band/CMakeFiles/epm.dir/build.make Band/CMakeFiles/epm.dir/clean
+.PHONY : Band/CMakeFiles/epm.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

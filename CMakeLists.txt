@@ -42,7 +42,7 @@ message("*****Compiling with Pardiso*****")
 find_package(LAPACK)
 
 
-set(dirs EigenSolverLapack Control List Reader Lattice Ham Main)
+set(dirs EigenSolverLapack Control List Reader Lattice Ham Band Main)
 
 # Find OpenMP installation and set compiler flags
 include(FindOpenMP)
@@ -69,8 +69,8 @@ add_dirs(${dirs})
 ##################################################################################
 if(CMAKE_BUILD_TYPE MATCHES "Release")
     add_executable(EPM_release Main/src/main.c)
-    target_link_libraries(EPM_release control lattice ham)
+    target_link_libraries(EPM_release control lattice ham epm)
 elseif(CMAKE_BUILD_TYPE MATCHES "Debug")
     add_executable(EPM_debug Main/src/main.c)
-    target_link_libraries(EPM_debug control lattice ham)
+    target_link_libraries(EPM_debug control lattice ham epm)
 endif()

@@ -4,7 +4,7 @@
 # compile C with /usr/bin/cc
 C_DEFINES = -DMKL_ILP64
 
-C_INCLUDES = -I/media/ze/Tool/EPM/Control/include -I/media/ze/Tool/EPM/Lattice/include -I/media/ze/Tool/EPM/Reader/include -I/media/ze/Tool/EPM/List/include -I/media/ze/Tool/EPM/Ham/include -I/media/ze/Tool/EPM/EigenSolverLapack/include
+C_INCLUDES = -I/media/ze/Tool/EPM/Control/include -I/media/ze/Tool/EPM/Lattice/include -I/media/ze/Tool/EPM/Reader/include -I/media/ze/Tool/EPM/List/include -I/media/ze/Tool/EPM/Ham/include -I/media/ze/Tool/EPM/EigenSolverLapack/include -I/media/ze/Tool/EPM/Band/include
 
 C_FLAGS =  -fopenmp -Wall -g -m64 -std=gnu11
 

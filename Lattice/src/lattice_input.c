@@ -227,7 +227,7 @@ static inline void BuildRe( Lattice *s)
 	}
 }
 
-
+// all the input file must be put inside a folder named by the title
 static inline void ReadPoscar	(Lattice *s, char *title )
 {
 	char 		*filename;

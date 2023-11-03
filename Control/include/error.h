@@ -1,4 +1,4 @@
-//
+ //
 // ERROR HANDLING MODULE
 // Errors are efficiently handled
 // and saved onto an output file for
@@ -23,7 +23,7 @@
 #define INPUT_ERROR     5
 #define OUTPUT_ERROR    6
 #define SIM_ERROR       7
-#define UMFPACK_ERROR   8
+#define LAPACK_ERROR    8
 //
 //
 //

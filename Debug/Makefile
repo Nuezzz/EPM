@@ -210,6 +210,19 @@ ham/fast:
 	$(MAKE) $(MAKESILENT) -f Ham/CMakeFiles/ham.dir/build.make Ham/CMakeFiles/ham.dir/build
 .PHONY : ham/fast
 
+#=============================================================================
+# Target rules for targets named epm
+
+# Build rule for target.
+epm: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 epm
+.PHONY : epm
+
+# fast build rule for target.
+epm/fast:
+	$(MAKE) $(MAKESILENT) -f Band/CMakeFiles/epm.dir/build.make Band/CMakeFiles/epm.dir/build
+.PHONY : epm/fast
+
 # target to build an object file
 Main/src/main.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/EPM_debug.dir/build.make CMakeFiles/EPM_debug.dir/Main/src/main.o
@@ -235,6 +248,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... EPM_debug"
 	@echo "... control"
+	@echo "... epm"
 	@echo "... ham"
 	@echo "... lapack_solver"
 	@echo "... lattice"

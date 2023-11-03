@@ -41,6 +41,8 @@ double complex *H_tot_loc ( Lattice *s, Eigen *d, double *Kvec)
 
 }
 
+
+
 double complex *H_tot_so ( Lattice *s, Eigen *d, double *Kvec)
 {
     int i;
@@ -142,20 +144,33 @@ void PrintNG(FILE *fp, int *NG, double *k_path, int N)
     
 }
 
-FILE *OpenBandFile( char* simname)
+FILE *OpenBandFile( char* pathname, unsigned int label)
 {
     FILE *fp;
-	char filename[128];
-	sprintf(filename,"%s/Band_Stracture.csv",simname);
+    char str_label[5];
+    sprintf(str_label, "%d", label);
+
+    char *band_name;
+    StringClone(band_name,BAND_FILENAME);
+    StrCat(&band_name, "_");
+    StrCat(&band_name, str_label);
+    StrCat(&band_name, ".csv");
+	char *filename=FullPath(pathname, band_name);
     fp = SafeFOpen(filename, "w");
     return fp;
 }
 
-FILE *OpenNGFile( char* simname)
+FILE *OpenWaveFile( char* pathname, unsigned int label)
 {
     FILE *fp;
-	char filename[128];
-	sprintf(filename,"%s/NG.csv",simname);
+    char str_label[5];
+    sprintf(str_label, "%d", label);
+    char *band_name;
+    StringClone(band_name,WAVE_FILENAME);
+    StrCat(&band_name, '_');
+    StrCat(&band_name, str_label);
+    StrCat(&band_name, ".dat");
+	char *filename=FullPath(pathname, band_name);
     fp = SafeFOpen(filename, "w");
     return fp;
 }

@@ -9,6 +9,14 @@
 #include "reader.h"
 #include "atom.h"
 
+
+/**
+ * @brief Print the G vector mesh in reciprocal space
+ * 
+ * @param s pointer to lattice 
+ * @param simname name of the simulation
+ * @param N number of valid G vectors for specific k point
+ */
 void PrintGvec(Eigen *s, char* simname, int N)
 {
     FILE *fp;
@@ -65,6 +73,7 @@ void BandFinish(Eigen *s)
 	free(s->G_stack);
 	free(s->E);
 	free(s->Phi);
+	free(s);
 }
 
 
@@ -76,11 +85,10 @@ void BandFinish(Eigen *s)
  * @param E_cut cut off energy (eV)
  * @param k_vec pointer of k_vector use as the center of G vector
  */
-static inline int BuildG(Lattice *s,Eigen *d, double E_cut)
+static inline int BuildG(Lattice *s,Eigen *d, double E_cut, unsigned int type)
 {
 	int i,j,k;
 
-	unsigned int type = s->pot_type;
 	int NG = 0; //count of number of valid G-vectors 
 	int G_int[3]; 
 	double G_tmp[3]; 
@@ -169,15 +177,15 @@ static inline int BuildG(Lattice *s,Eigen *d, double E_cut)
  * @param L lattice pointer that has already been fulfilled
  * @param NG pointer to output the number of G_Vec within the cut off
  * @param k_vec pointer to pass the central k_vec
- * @param E_cut cut off energy
+ * @param E_cut cut off energy (eV)
  * @return Eigen* 
  */
-Eigen *GVecInit( Lattice *L, double *k_vec, double E_cut)
+Eigen *GVecInit( Lattice *L, double *k_vec, double E_cut, unsigned int ptype)
 {
 	Eigen *s=SafeCalloc(1, sizeof(Eigen));
 
 	s->k_vec[0]=k_vec[0]; s->k_vec[1]=k_vec[1]; s->k_vec[2]=k_vec[2];
-	s->NG= BuildG(L,s,E_cut);
+	s->NG= BuildG(L,s,E_cut,ptype);
 
 	if(s->NG ==  0)
 	{

@@ -19,5 +19,8 @@
 /media/ze/Tool/EPM/Debug/Ham/CMakeFiles/ham.dir
 /media/ze/Tool/EPM/Debug/Ham/CMakeFiles/edit_cache.dir
 /media/ze/Tool/EPM/Debug/Ham/CMakeFiles/rebuild_cache.dir
+/media/ze/Tool/EPM/Debug/Band/CMakeFiles/epm.dir
+/media/ze/Tool/EPM/Debug/Band/CMakeFiles/edit_cache.dir
+/media/ze/Tool/EPM/Debug/Band/CMakeFiles/rebuild_cache.dir
 /media/ze/Tool/EPM/Debug/Main/CMakeFiles/edit_cache.dir
 /media/ze/Tool/EPM/Debug/Main/CMakeFiles/rebuild_cache.dir

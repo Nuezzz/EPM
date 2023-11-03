@@ -45,7 +45,6 @@ double complex *HSO ( Lattice *s, Eigen *d, double *k_vec)
 {
     double q[3], cross[3];
     double k_pg[3],kp_pg[3];
-	double k_mod;
     double complex vso_tmp;
 	double complex vloc_tmp;
 	
@@ -85,8 +84,8 @@ double complex *HSO ( Lattice *s, Eigen *d, double *k_vec)
 			vso_tmp /= n_atom;
 
 			//multiply the spin-orbit coupling potential with the phase factor
-			double complex v_test1 = 0.00001*(-I*cross[2]);
-			double complex v_test2 = 0.00001*(-cross[1]-I*cross[0]);
+			//double complex v_test1 = 0.00001*(-I*cross[2]);
+			//double complex v_test2 = 0.00001*(-cross[1]-I*cross[0]);
 			//print out the complex number v_test
 			//printf("%f:  %f + %fi\n",cross[2], creal(v_test), cimag(v_test));
 

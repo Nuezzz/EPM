@@ -1,0 +1,2 @@
+/usr/bin/ar qc libepm.a CMakeFiles/epm.dir/src/epm_input.o CMakeFiles/epm.dir/src/epm.o
+/usr/bin/ranlib libepm.a

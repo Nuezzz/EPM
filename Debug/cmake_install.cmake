@@ -50,6 +50,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/media/ze/Tool/EPM/Debug/Reader/cmake_install.cmake")
   include("/media/ze/Tool/EPM/Debug/Lattice/cmake_install.cmake")
   include("/media/ze/Tool/EPM/Debug/Ham/cmake_install.cmake")
+  include("/media/ze/Tool/EPM/Debug/Band/cmake_install.cmake")
   include("/media/ze/Tool/EPM/Debug/Main/cmake_install.cmake")
 
 endif()

@@ -43,8 +43,6 @@ typedef struct atomstack
 
 typedef struct lattice
 {
-    //Type of potential
-    unsigned int pot_type;
     /*Info of atom species*/
 	unsigned int n_spe; // number of atom spycies
     unsigned int *natom_spe;
@@ -57,12 +55,6 @@ typedef struct lattice
     double A0; // lattice constant
     double vol;// the volume of unit cell  (A^3)
 
-    unsigned int n_kstep; // number of strps per k-path
-    double Emax; //cut off energy (in Rydberg)
-
-
-    Timer Form_time;
-    Timer Solve_time;
 
 	AtomStack   *a_set;// Atom sets
     // ParamStack  *pset_storage;
@@ -85,6 +77,6 @@ typedef struct eigen
 Lattice *LatticeInitial ( char *title );
 void    FindNeighbor    (double A_dis, Lattice *l);
 void    PrintGvec       (Eigen *s, char* filename, int N);
-Eigen  *GVecInit        ( Lattice *L, double *k_vec, double E_cut);
+Eigen  *GVecInit        ( Lattice *L, double *k_vec, double E_cut, unsigned int ptype);
 void    BandFinish      (Eigen *s);
 #endif 
